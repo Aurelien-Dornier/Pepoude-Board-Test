@@ -10,8 +10,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "dev": "nodemon app.js",
-    "db:reset": "node src/migration/createTables.js",
-    "db:seed": "node src/migration/seedDataBase.js",
+    "db:reset": "node src/seed/createTables.js",
+    "db:seed": "node src/seed/seedDataBase.js",
     "test": "jest "
   },
   "keywords": [],
