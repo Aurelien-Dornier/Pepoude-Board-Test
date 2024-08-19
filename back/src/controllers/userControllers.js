@@ -112,7 +112,7 @@ export const getAllUsers = async (req, res) => {
     });
   }
 };
-
+// get user by name
 export const getUserByName = async (req, res) => {
   try {
     const searchSchema = Joi.object({
