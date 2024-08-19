@@ -10,12 +10,8 @@ export async function seedDataBase() {
   try {
     await seedUsers();
     const categories = await seedCategories();
-    const products = await seedProducts(categories);
-    if (products.length > 0) {
-      await seedOrders(products);
-    } else {
-      console.log("Skipping orders seeding due to no products");
-    }
+    await seedProducts(categories);
+    await seedOrders();
     await seedMessages();
     await seedLogs();
     console.log("🌱 Database seeded successfully");

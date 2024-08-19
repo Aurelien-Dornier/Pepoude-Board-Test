@@ -5,9 +5,30 @@ const { Category } = models;
 export const seedCategories = async () => {
   try {
     const categories = await Category.bulkCreate([
-      { name: "Electronics" },
-      { name: "Clothing" },
+      { name: "Art" },
+      { name: "Automotive" },
       { name: "Books" },
+      { name: "Beauty" },
+      { name: "Books" },
+      { name: "Clothing" },
+      { name: "Electronics" },
+      { name: "Fashion" },
+      { name: "Furniture" },
+      { name: "Fitness" },
+      { name: "Gaming" },
+      { name: "Health" },
+      { name: "Home" },
+      { name: "Jewelry" },
+      { name: "Music" },
+      { name: "Outdoors" },
+      { name: "Pet" },
+      { name: "Sports" },
+      { name: "Shoes" },
+      { name: "Toys" },
+      { name: "Travel" },
+      { name: "Technology" },
+      { name: "Travel" },
+      { name: "Watches" },
     ]);
     console.log(" ✅ Categories seeded successfully");
     return categories;
