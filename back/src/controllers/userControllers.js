@@ -113,12 +113,11 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-const searchSchema = Joi.object({
-  username: Joi.string().min(1).required(),
-});
-
 export const getUserByName = async (req, res) => {
   try {
+    const searchSchema = Joi.object({
+      username: Joi.string().min(1).required(),
+    });
     // Validation de l'entrée
     const { error } = searchSchema.validate(req.query);
     if (error) {
