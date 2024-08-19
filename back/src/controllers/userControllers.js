@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { Op } from "sequelize";
+import Joi from "joi";
 import { models } from "../models/index.js";
 
 const { User } = models;
@@ -46,7 +48,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// Login User
+// Login User with validation
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -106,6 +108,57 @@ export const getAllUsers = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "error while fetching users...",
+      error: error.message,
+    });
+  }
+};
+
+const searchSchema = Joi.object({
+  username: Joi.string().min(1).required(),
+});
+
+export const getUserByName = async (req, res) => {
+  try {
+    // Validation de l'entrée
+    const { error } = searchSchema.validate(req.query);
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors: error.details[0].message,
+      });
+    }
+
+    const { username } = req.query;
+
+    // Utilisation de LIKE pour une recherche partielle
+    const users = await User.findAll({
+      where: {
+        username: {
+          [Op.like]: `%${username}%`,
+        },
+      },
+      attributes: { exclude: ["password"] },
+    });
+
+    if (users.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No users found",
+        errors: "No users found matching the search criteria",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Users found",
+      data: users,
+    });
+  } catch (error) {
+    console.error("Error in getUserByName:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching users",
       error: error.message,
     });
   }
