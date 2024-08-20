@@ -11,7 +11,7 @@ router.get("/orders", authenticateToken, ctrlWrapper(orderControllers.getAllOrde
 // Get order by id
 router.get("/order/:id", authenticateToken, ctrlWrapper(orderControllers.getOrderById));
 // Create order
-router.post("/create/order", orderControllers.creatOrder);
+router.post("/create/order", ctrlWrapper(orderControllers.creatOrder));
 // Update order
 router.patch("/update/order/:id", ctrlWrapper(orderControllers.updateOrder));
 // Delete order

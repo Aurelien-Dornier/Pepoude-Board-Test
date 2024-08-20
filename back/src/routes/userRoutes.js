@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { ctrlWrapper } from "../utils/ctrlWrapper.js";
+import { validateUser } from "../middlewares/mdwUserValidation.js";
 import { authenticateToken } from "../middlewares/mdwAuth.js";
 import * as userControllers from "../controllers/userControllers.js";
 
@@ -13,4 +14,4 @@ router.get("/users/:name", authenticateToken, ctrlWrapper(userControllers.getUse
 //AUTH login user
 router.post("/login", ctrlWrapper(userControllers.loginUser));
 //AUTH register user
-router.post("/register", ctrlWrapper(userControllers.registerUser));
+router.post("/register", validateUser, ctrlWrapper(userControllers.registerUser));
