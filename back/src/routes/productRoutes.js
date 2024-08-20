@@ -7,12 +7,12 @@ export const router = Router();
 //get all products
 router.get("/products", ctrlWrapper(productControllers.getAllProducts));
 // search product by name
-router.get("/products/:name", ctrlWrapper(productControllers.getProductByName));
+router.get("/products/search", ctrlWrapper(productControllers.getProductByName));
 // get product by id
-router.get("/product/:id", ctrlWrapper(productControllers.getProductById));
+router.get("/products/:id", ctrlWrapper(productControllers.getProductById));
 // create product
-router.post("/product", ctrlWrapper(productControllers.createProduct));
+router.post("/products", ctrlWrapper(productControllers.createProduct));
 // update product
-router.put("/product/:id", ctrlWrapper(productControllers.updateProduct));
+router.put("/products/:id", ctrlWrapper(productControllers.updateProduct));
 // delete product
-router.delete("/product/:id", ctrlWrapper(productControllers.deleteProduct));
+router.delete("/products/:id", ctrlWrapper(productControllers.deleteProduct));

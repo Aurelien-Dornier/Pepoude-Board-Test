@@ -9,16 +9,16 @@ export const router = Router();
 // Get all orders with pagination and filtering
 router.get("/orders", authenticateToken, ctrlWrapper(orderControllers.getAllOrders));
 // Get order by id
-router.get("/order/:id", authenticateToken, ctrlWrapper(orderControllers.getOrderById));
+router.get("/orders/:id", authenticateToken, ctrlWrapper(orderControllers.getOrderById));
 // Create order
-router.post("/create/order", ctrlWrapper(orderControllers.creatOrder));
+router.post("/orders", authenticateToken, ctrlWrapper(orderControllers.creatOrder));
 // Update order
-router.patch("/update/order/:id", ctrlWrapper(orderControllers.updateOrder));
+router.patch("/orders/:id", authenticateToken, ctrlWrapper(orderControllers.updateOrder));
 // Delete order
-router.delete("/delete/order/:id", ctrlWrapper(orderControllers.deleteOrder));
+router.delete("/orders/:id", authenticateToken, ctrlWrapper(orderControllers.deleteOrder));
 // Get order statistics
 router.get(
   "/orders/statistics",
-
+  authenticateToken,
   ctrlWrapper(orderControllers.getOrderStatistics)
 );
