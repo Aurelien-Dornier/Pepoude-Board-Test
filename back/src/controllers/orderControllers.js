@@ -2,7 +2,7 @@ import { models } from "../models/index.js";
 import Joi from "joi";
 import { Op } from "sequelize";
 
-const { Order, User, Product, sequelize } = models;
+const { Order, User, Product, OrderProduct, sequelize } = models;
 
 const orderSchema = Joi.object({
   userId: Joi.number().required(),
@@ -22,11 +22,15 @@ const orderSchema = Joi.object({
 // Get all orders with pagination and filtering
 export const getAllOrders = async (req, res) => {
   try {
+    console.log("Starting getAllOrders");
+    console.log("Query parameters:", req.query);
+    // pagination dans la requête
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     const { status, startDate, endDate, userId } = req.query;
 
+    // filtres dans la requête
     const whereClause = {};
     if (status) whereClause.status = status;
     if (startDate && endDate) {
@@ -35,17 +39,32 @@ export const getAllOrders = async (req, res) => {
       };
     }
     if (userId) whereClause.userId = userId;
+    console.log("whereClause", whereClause);
 
+    console.log("executing query...");
+    // tri dans la requête
     const { count, rows } = await Order.findAndCountAll({
       where: whereClause,
       limit,
       offset,
       include: [
-        { model: User, attributes: ["id", "username", "email"] },
-        { model: Product, through: { attributes: ["quantity"] } },
+        {
+          model: User,
+          attributes: ["id", "username", "email"],
+        },
+        {
+          model: Product,
+          through: {
+            model: OrderProduct,
+            attributes: ["quantity"],
+          },
+        },
       ],
       order: [["createdAt", "DESC"]],
     });
+
+    console.log("Query executed successfully");
+    console.log("Sending response...");
 
     res.status(200).json({
       success: true,
@@ -55,6 +74,7 @@ export const getAllOrders = async (req, res) => {
       currentPage: page,
       totalCount: count,
     });
+    console.log("Response sent");
   } catch (error) {
     console.error("Error in getAllOrders:", error);
     res.status(500).json({
