@@ -42,9 +42,10 @@ export class Product extends Model {
       as: "category",
     });
     this.belongsToMany(models.Order, {
-      through: "OrderProduct",
+      through: models.OrderProduct,
       as: "orders",
       foreignKey: "productId",
+      otherKey: "orderId",
     });
   }
 }
