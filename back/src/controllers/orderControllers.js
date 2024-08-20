@@ -113,7 +113,7 @@ export const createOrder = async (req, res) => {
 
     // Calculate total amount
     let totalAmount = 0;
-    for (let product of products) {
+    for (const product of products) {
       const dbProduct = await Product.findByPk(product.productId);
       if (!dbProduct) {
         throw new Error(`Product with id ${product.productId} not found`);
@@ -133,7 +133,7 @@ export const createOrder = async (req, res) => {
       { transaction: t }
     );
 
-    for (let product of products) {
+    for (const product of products) {
       await newOrder.addProduct(product.productId, {
         through: { quantity: product.quantity },
         transaction: t,
@@ -195,7 +195,7 @@ export const updateOrder = async (req, res) => {
 
     // Recalculate total amount and update stock
     let totalAmount = 0;
-    for (let product of products) {
+    for (const product of products) {
       const dbProduct = await Product.findByPk(product.productId);
       if (!dbProduct) {
         throw new Error(`Product with id ${product.productId} not found`);
@@ -224,7 +224,7 @@ export const updateOrder = async (req, res) => {
     await order.update({ userId, status, totalAmount }, { transaction: t });
 
     await order.setProducts([], { transaction: t });
-    for (let product of products) {
+    for (const product of products) {
       await order.addProduct(product.productId, {
         through: { quantity: product.quantity },
         transaction: t,
@@ -271,7 +271,7 @@ export const deleteOrder = async (req, res) => {
     }
 
     // Restore product stock
-    for (let product of order.Products) {
+    for (const product of order.Products) {
       await Product.increment("stock", {
         by: product.OrderProduct.quantity,
         where: { id: product.id },

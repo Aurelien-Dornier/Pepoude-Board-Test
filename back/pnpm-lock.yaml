@@ -48,6 +48,9 @@ importers:
       '@faker-js/faker':
         specifier: ^8.4.1
         version: 8.4.1
+      '@types/jsonwebtoken':
+        specifier: ^9.0.6
+        version: 9.0.6
       babel-jest:
         specifier: ^29.7.0
         version: 29.7.0(@babel/core@7.25.2)
@@ -892,6 +895,9 @@ packages:
 
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+
+  '@types/jsonwebtoken@9.0.6':
+    resolution: {integrity: sha512-/5hndP5dCjloafCXns6SZyESp3Ldq7YjH3zwzwczYnjxIT0Fqzk5ROSYVGfFyczIue7IUEj8hkvLbPoLQ18vQw==}
 
   '@types/ms@0.7.34':
     resolution: {integrity: sha512-nG96G3Wp6acyAgJqGasjODb+acrI7KltPiRxzHPXnP3NgI28bpQDRv53olbqGXbfcgF5aiiHmO3xpwEpS5Ld9g==}
@@ -4234,6 +4240,10 @@ snapshots:
       '@types/istanbul-lib-report': 3.0.3
 
   '@types/json5@0.0.29': {}
+
+  '@types/jsonwebtoken@9.0.6':
+    dependencies:
+      '@types/node': 22.4.1
 
   '@types/ms@0.7.34': {}
 
