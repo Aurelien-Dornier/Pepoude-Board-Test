@@ -38,4 +38,3 @@ export async function seedOrderProduct() {
     console.error("Error in seedOrderProduct:", error);
   }
 }
-seedOrderProduct();
