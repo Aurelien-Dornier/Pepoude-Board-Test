@@ -10,4 +10,4 @@ router.get("/", (req, res) => {
 
 router.use(userRouter);
 router.use(productRouter);
-router.use(orderRouter);
+router.use("/orders", orderRouter);

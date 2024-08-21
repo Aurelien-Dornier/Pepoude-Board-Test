@@ -251,38 +251,6 @@ export const deleteOrder = async (req, res) => {
   }
 };
 
-// Get order statistics
-export const getOrderStatistics = async (req, res) => {
-  try {
-    const totalOrders = await Order.count();
-    const totalRevenue = await Order.sum("totalAmount");
-    const averageOrderValue = totalRevenue / totalOrders;
-
-    const ordersByStatus = await Order.findAll({
-      attributes: ["status", [sequelize.fn("count", sequelize.col("status")), "count"]],
-      group: ["status"],
-    });
-
-    res.status(200).json({
-      success: true,
-      message: "Order statistics fetched successfully",
-      data: {
-        totalOrders,
-        totalRevenue,
-        averageOrderValue,
-        ordersByStatus,
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching order statistics:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error while fetching order statistics",
-      error: error.message,
-    });
-  }
-};
-
 // Create order
 export const creatOrder = async (req, res) => {
   const validateOrderData = async (data) => {
@@ -364,6 +332,38 @@ export const creatOrder = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error while creating order",
+      error: error.message,
+    });
+  }
+};
+
+// Get order statistics
+export const getOrderStatistics = async (req, res) => {
+  try {
+    const totalOrders = await Order.count();
+    const totalRevenue = await Order.sum("totalAmount");
+    const averageOrderValue = totalRevenue / totalOrders;
+
+    const ordersByStatus = await Order.findAll({
+      attributes: ["status", [sequelize.fn("count", sequelize.col("status")), "count"]],
+      group: ["status"],
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Order statistics fetched successfully",
+      data: {
+        totalOrders,
+        totalRevenue,
+        averageOrderValue,
+        ordersByStatus,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching order statistics:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error while fetching order statistics",
       error: error.message,
     });
   }
