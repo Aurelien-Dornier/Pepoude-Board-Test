@@ -7,16 +7,26 @@ import RegisterPage from "./pages/RegisterPage";
 import Dashboard from "./pages/Dashboard";
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    Boolean(localStorage.getItem("token"))
-  );
+  // gestion de l'authentification
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Mettre à jour l'état d'authentification lorsqu'on change le token
-  useEffect(() => {
+  // fonction pour vérifier l'authentification
+  const checkAuth = () => {
     const token = localStorage.getItem("token");
-    console.log(localStorage.getItem("token"));
     setIsAuthenticated(Boolean(token));
+  };
+  // vérification + ajout d'un écouteur d'événement pour la modification du localStorage
+  useEffect(() => {
+    checkAuth();
+    window.addEventListener("storage", checkAuth);
+    return () => window.removeEventListener("storage", checkAuth);
   }, []);
+
+  const handleLogin = (token: string) => {
+    // console.log("Handling login with token:", token); // debug
+    localStorage.setItem("token", token);
+    setIsAuthenticated(true);
+  };
 
   return (
     <div className="bg-gray-200 min-h-screen flex flex-col">
@@ -35,7 +45,7 @@ export default function App() {
           />
           <Route
             path="/login"
-            element={<LoginPage setIsAuthenticated={setIsAuthenticated} />}
+            element={<LoginPage onLogin={handleLogin} />}
           />
           <Route path="/register" element={<RegisterPage />} />
           <Route

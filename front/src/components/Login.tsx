@@ -2,7 +2,11 @@ import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { loginUser } from "../api/Api";
 
-export default function Login({ setIsAuthenticated }: { setIsAuthenticated: (auth: boolean) => void }) {
+export default function Login({
+  onLogin,
+}: {
+  onLogin: (token: string) => void;
+}) {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -17,18 +21,18 @@ export default function Login({ setIsAuthenticated }: { setIsAuthenticated: (aut
     setLoading(true);
 
     try {
-      const user = await loginUser(email, password);
-      console.log("User logged in:", user);
+      const response = await loginUser(email, password);
+      console.log("Login response:", response);
 
-      if (user?.token) {
-        localStorage.setItem("token", user.token);
-        console.log(localStorage.getItem("token"));
-        setIsAuthenticated(true); // Mettre à jour l'état d'authentification
-        navigate("/dashboard"); // Rediriger après la connexion
+      if (response.success && response.data.token) {
+        console.log("Login successful, token:", response.data.token);
+        onLogin(response.data.token);
+        navigate("/dashboard");
       } else {
-        setError("Login failed. Please try again.");
+        setError(response.message || "Login failed. Please try again.");
       }
-    } catch {
+    } catch (error) {
+      console.error("Login error:", error);
       setError("Invalid email or password, please try again");
     } finally {
       setLoading(false);
@@ -91,7 +95,11 @@ export default function Login({ setIsAuthenticated }: { setIsAuthenticated: (aut
         </div>
         <div>
           <div className="form-control mt-4">
-            <button className="btn btn-primary" type="submit" disabled={loading}>
+            <button
+              className="btn btn-primary"
+              type="submit"
+              disabled={loading}
+            >
               {loading ? "Logging in..." : "Login"}
             </button>
           </div>

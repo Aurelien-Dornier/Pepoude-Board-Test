@@ -1,10 +1,13 @@
 import Login from "../components/Login";
 
 export default function LoginPage({
-  setIsAuthenticated}: {setIsAuthenticated: (isAuthenticated: boolean) => void}) {
+  onLogin
+}: {
+  onLogin: (token: string) => void
+}) {
   return (
     <div className="flex justify-center items-center">
-      <Login setIsAuthenticated={setIsAuthenticated} />
+      <Login onLogin={onLogin} />
     </div>
   );
 }

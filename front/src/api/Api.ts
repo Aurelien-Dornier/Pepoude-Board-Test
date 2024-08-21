@@ -28,9 +28,9 @@ export const createAccount = async (data: {
 export const loginUser = async (
   email: string,
   password: string
-): Promise<IUser | null> => {
+): Promise<{success: boolean, message: string, data: {token: string, user: IUser}}> => {
   try {
-    const response = await axios.post<IUser>(
+    const response = await axios.post(
       `${apiBaseUrl}/api/login`,
       { email, password },
       { withCredentials: true }
