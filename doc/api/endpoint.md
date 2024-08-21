@@ -84,3 +84,7 @@ L'API utilise l'authentification JWT (JSON Web Token). Pour accéder aux endpoin
 ```bash
 http://localhost:3000/api/users/name?username=pepin
 ```
+
+```bash
+http://localhost:3000/api/usersproducts/search?status=pending
+```
