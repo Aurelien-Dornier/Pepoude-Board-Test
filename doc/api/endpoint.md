@@ -20,7 +20,7 @@ Cette API permet de gérer les utilisateurs, les produits et les commandes pour 
 
 L'API utilise l'authentification JWT (JSON Web Token). Pour accéder aux endpoints protégés, incluez le token dans l'en-tête `Authorization` sous la forme `Bearer <token>`.
 
-## Routes Utilisateurs
+## Routes Utilisateurs (Users)
 
 | Méthode | Chemin       | Middleware        | Contrôleur    | Description                            | Paramètres                      |
 | ------- | ------------ | ----------------- | ------------- | -------------------------------------- | ------------------------------- |
@@ -29,7 +29,7 @@ L'API utilise l'authentification JWT (JSON Web Token). Pour accéder aux endpoin
 | POST    | /login       | -                 | loginUser     | Connexion utilisateur                  | email, password                 |
 | POST    | /register    | validateUser      | registerUser  | Inscription utilisateur                | username, email, password, role |
 
-## Routes Produits
+## Routes Produits (Products)
 
 | Méthode | Chemin           | Middleware        | Contrôleur       | Description                   | Paramètres                         |
 | ------- | ---------------- | ----------------- | ---------------- | ----------------------------- | ---------------------------------- |
@@ -40,7 +40,7 @@ L'API utilise l'authentification JWT (JSON Web Token). Pour accéder aux endpoin
 | PUT     | /products/:id    | authenticateToken | updateProduct    | Mettre à jour un produit      | name, description, price, category |
 | DELETE  | /products/:id    | authenticateToken | deleteProduct    | Supprimer un produit          | -                                  |
 
-## Routes Commandes
+## Routes Commandes (Orders)
 
 | Méthode | Chemin             | Middleware        | Contrôleur         | Description                            | Paramètres            |
 | ------- | ------------------ | ----------------- | ------------------ | -------------------------------------- | --------------------- |
@@ -50,6 +50,83 @@ L'API utilise l'authentification JWT (JSON Web Token). Pour accéder aux endpoin
 | PATCH   | /orders/:id        | authenticateToken | updateOrder        | Mettre à jour une commande             | status                |
 | DELETE  | /orders/:id        | authenticateToken | deleteOrder        | Supprimer une commande                 | -                     |
 | GET     | /orders/statistics | authenticateToken | getOrderStatistics | Obtenir les statistiques des commandes | startDate, endDate    |
+
+### quelques exemples de requêtes et réponses
+
+#### Créer une commande (POST)
+
+```bash
+http://localhost:3000/api/orders
+```
+
+**exemple de contenu de la requête**
+
+```json
+{
+  "userId": 2,
+  "status": "pending",
+  "products": [
+    {
+      "productId": 14,
+      "quantity": 1
+    },
+    {
+      "productId": 9,
+      "quantity": 1
+    }
+  ]
+}
+```
+
+**Reponse 201 Created**
+
+```json
+{
+  "success": true,
+  "message": "Order created successfully",
+  "data": {
+    "id": 32,
+    "status": "pending",
+    "totalAmount": "119.98",
+    "createdAt": "2024-08-21T18:40:01.177Z",
+    "updatedAt": "2024-08-21T18:40:01.177Z",
+    "userId": 2,
+    "user": {
+      "id": 2,
+      "username": "generalpepin",
+      "email": "generalpepin@example.com"
+    },
+    "Products": [
+      {
+        "id": 14,
+        "name": "Travel Pillow",
+        "description": "Memory foam travel pillow",
+        "price": "19.99",
+        "stock": 9,
+        "createdAt": "2024-08-21T14:39:02.846Z",
+        "updatedAt": "2024-08-21T18:40:01.187Z",
+        "categoryId": 21,
+        "OrderProduct": {
+          "quantity": 1
+        }
+      },
+      {
+        "id": 9,
+        "name": "Fitness Tracker",
+        "description": "Latest model fitness tracker",
+        "price": "99.99",
+        "stock": 9,
+        "createdAt": "2024-08-21T14:39:02.846Z",
+        "updatedAt": "2024-08-21T18:40:01.190Z",
+        "categoryId": 18,
+        "OrderProduct": {
+          "quantity": 1
+        }
+      }
+    ]
+  }
+}
+```
 
 ## Middlewares
 
