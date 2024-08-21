@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { loginUser } from "../api/Api";
 
-export default function Login() {
+export default function Login({ setIsAuthenticated }: { setIsAuthenticated: (auth: boolean) => void }) {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -18,13 +18,18 @@ export default function Login() {
 
     try {
       const user = await loginUser(email, password);
-      
       console.log("User logged in:", user);
-      localStorage.setItem("token", user.token);
-        navigate("/dashboard");
-    } catch (err) {
+
+      if (user?.token) {
+        localStorage.setItem("token", user.token);
+        console.log(localStorage.getItem("token"));
+        setIsAuthenticated(true); // Mettre à jour l'état d'authentification
+        navigate("/dashboard"); // Rediriger après la connexion
+      } else {
+        setError("Login failed. Please try again.");
+      }
+    } catch {
       setError("Invalid email or password, please try again");
-      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -87,7 +92,7 @@ export default function Login() {
         <div>
           <div className="form-control mt-4">
             <button className="btn btn-primary" type="submit" disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
+              {loading ? "Logging in..." : "Login"}
             </button>
           </div>
           <div className="form-control mt-6">

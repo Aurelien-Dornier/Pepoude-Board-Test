@@ -38,6 +38,6 @@ export const loginUser = async (
     return response.data;
   } catch (error) {
     console.error("loginUser error:", error);
-    return null;
+    throw error;
   }
 };
