@@ -1,8 +1,9 @@
 import { models } from "../models/index.js";
 import Joi from "joi";
 import { Op } from "sequelize";
+import { sequelize } from "../models/dbClient.js";
 
-const { Order, User, Product, sequelize } = models;
+const { Order, User, Product, OrderProduct } = models;
 
 const orderSchema = Joi.object({
   userId: Joi.number().required(),
@@ -22,11 +23,15 @@ const orderSchema = Joi.object({
 // Get all orders with pagination and filtering
 export const getAllOrders = async (req, res) => {
   try {
+    console.log("Starting getAllOrders");
+    console.log("Query parameters:", req.query);
+    // pagination dans la requête
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
     const { status, startDate, endDate, userId } = req.query;
 
+    // filtres dans la requête
     const whereClause = {};
     if (status) whereClause.status = status;
     if (startDate && endDate) {
@@ -35,17 +40,32 @@ export const getAllOrders = async (req, res) => {
       };
     }
     if (userId) whereClause.userId = userId;
+    console.log("whereClause", whereClause);
 
+    console.log("executing query...");
+    // tri dans la requête
     const { count, rows } = await Order.findAndCountAll({
       where: whereClause,
       limit,
       offset,
       include: [
-        { model: User, attributes: ["id", "username", "email"] },
-        { model: Product, through: { attributes: ["quantity"] } },
+        {
+          model: User,
+          attributes: ["id", "username", "email"],
+        },
+        {
+          model: Product,
+          through: {
+            model: OrderProduct,
+            attributes: ["quantity"],
+          },
+        },
       ],
       order: [["createdAt", "DESC"]],
     });
+
+    console.log("Query executed successfully");
+    console.log("Sending response...");
 
     res.status(200).json({
       success: true,
@@ -55,6 +75,7 @@ export const getAllOrders = async (req, res) => {
       currentPage: page,
       totalCount: count,
     });
+    console.log("Response sent");
   } catch (error) {
     console.error("Error in getAllOrders:", error);
     res.status(500).json({
@@ -91,80 +112,6 @@ export const getOrderById = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error while fetching order",
-      error: error.message,
-    });
-  }
-};
-
-// Create order
-export const createOrder = async (req, res) => {
-  const t = await sequelize.transaction();
-  try {
-    const { error } = orderSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        message: "Validation error",
-        errors: error.details[0].message,
-      });
-    }
-
-    const { userId, products, status } = req.body;
-
-    // Calculate total amount
-    let totalAmount = 0;
-    for (const product of products) {
-      const dbProduct = await Product.findByPk(product.productId);
-      if (!dbProduct) {
-        throw new Error(`Product with id ${product.productId} not found`);
-      }
-      if (dbProduct.stock < product.quantity) {
-        throw new Error(`Insufficient stock for product ${dbProduct.name}`);
-      }
-      totalAmount += dbProduct.price * product.quantity;
-    }
-
-    const newOrder = await Order.create(
-      {
-        userId,
-        status,
-        totalAmount,
-      },
-      { transaction: t }
-    );
-
-    for (const product of products) {
-      await newOrder.addProduct(product.productId, {
-        through: { quantity: product.quantity },
-        transaction: t,
-      });
-      await Product.decrement("stock", {
-        by: product.quantity,
-        where: { id: product.productId },
-        transaction: t,
-      });
-    }
-
-    await t.commit();
-
-    const createdOrder = await Order.findByPk(newOrder.id, {
-      include: [
-        { model: User, attributes: ["id", "username", "email"] },
-        { model: Product, through: { attributes: ["quantity"] } },
-      ],
-    });
-
-    res.status(201).json({
-      success: true,
-      message: "Order created successfully",
-      data: createdOrder,
-    });
-  } catch (error) {
-    await t.rollback();
-    console.error("Error in createOrder:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error while creating order",
       error: error.message,
     });
   }
@@ -258,37 +205,22 @@ export const updateOrder = async (req, res) => {
 
 // Delete order
 export const deleteOrder = async (req, res) => {
-  const t = await sequelize.transaction();
   try {
-    const order = await Order.findByPk(req.params.id, {
-      include: [{ model: Product, through: { attributes: ["quantity"] } }],
-    });
+    const orderId = req.params.id;
+    const order = await Order.findByPk(orderId);
     if (!order) {
       return res.status(404).json({
         success: false,
         message: "Order not found",
+        errors: "Order not found",
       });
     }
-
-    // Restore product stock
-    for (const product of order.Products) {
-      await Product.increment("stock", {
-        by: product.OrderProduct.quantity,
-        where: { id: product.id },
-        transaction: t,
-      });
-    }
-
-    await order.destroy({ transaction: t });
-
-    await t.commit();
-
+    await order.destroy();
     res.status(200).json({
       success: true,
       message: "Order deleted successfully",
     });
   } catch (error) {
-    await t.rollback();
     console.error("Error deleting order:", error);
     res.status(500).json({
       success: false,
@@ -325,6 +257,93 @@ export const getOrderStatistics = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error while fetching order statistics",
+      error: error.message,
+    });
+  }
+};
+
+// Create order
+
+const validateOrderData = async (data) => {
+  const { error } = orderSchema.validate(data);
+  if (error) {
+    throw new Error(error.details[0].message);
+  }
+};
+
+const calculateTotalAmount = async (products) => {
+  let totalAmount = 0;
+  for (const product of products) {
+    const dbProduct = await Product.findByPk(product.productId);
+    if (!dbProduct) {
+      throw new Error(`Product with id ${product.productId} not found`);
+    }
+    if (dbProduct.stock < product.quantity) {
+      throw new Error(`Insufficient stock for product ${dbProduct.name}`);
+    }
+    totalAmount += dbProduct.price * product.quantity;
+  }
+  return totalAmount;
+};
+
+const createOrderInDatabase = async (orderData, t) => {
+  return await Order.create(orderData, { transaction: t });
+};
+
+const addProductsToOrder = async (newOrder, products, t) => {
+  for (const product of products) {
+    await newOrder.addProduct(product.productId, {
+      through: { quantity: product.quantity },
+      transaction: t,
+    });
+    await Product.decrement("stock", {
+      by: product.quantity,
+      where: { id: product.productId },
+      transaction: t,
+    });
+  }
+};
+
+const getCreatedOrder = async (orderId) => {
+  return await Order.findByPk(orderId, {
+    include: [
+      { model: User, attributes: ["id", "username", "email"] },
+      { model: Product, through: { attributes: ["quantity"] } },
+    ],
+  });
+};
+
+export const creatOrder = async (req, res) => {
+  const t = await sequelize.transaction();
+
+  try {
+    validateOrderData(req.body);
+
+    const { userId, products, status } = req.body;
+    const totalAmount = await calculateTotalAmount(products);
+    const newOrder = await createOrderInDatabase({ userId, status, totalAmount }, t);
+    await addProductsToOrder(newOrder, products, t);
+    await t.commit();
+    const createdOrder = await getCreatedOrder(newOrder.id);
+
+    res.status(201).json({
+      success: true,
+      message: "Order created successfully",
+      data: createdOrder,
+    });
+  } catch (error) {
+    await t.rollback();
+    if (error.name === "SequelizeUniqueConstraintError") {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors: error.errors.map((err) => ({ message: err.message, field: err.path })),
+      });
+    }
+    console.error("Error in createOrder:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error while creating order",
       error: error.message,
     });
   }

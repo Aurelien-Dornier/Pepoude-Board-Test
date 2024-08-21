@@ -31,12 +31,11 @@ export class Order extends Model {
   static associate(models) {
     this.belongsTo(models.User, {
       foreignKey: "userId",
-      as: "user",
     });
     this.belongsToMany(models.Product, {
-      through: "OrderProduct",
-      as: "products",
+      through: models.OrderProduct,
       foreignKey: "orderId",
+      otherKey: "productId",
     });
   }
 }
