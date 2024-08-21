@@ -143,18 +143,25 @@ export const updateOrder = async (req, res) => {
       if (!dbProduct) {
         throw new Error(`Product with id ${product.productId} not found`);
       }
-      const oldQuantity = await order.getProduct({
-        where: { id: product.productId },
-        attributes: ["orderProduct.quantity"],
+
+      const oldOrderProduct = await OrderProduct.findOne({
+        where: {
+          orderId: order.id,
+          productId: product.productId,
+        },
       });
-      const quantityDecrement = product.quantity - oldQuantity[0]?.OrderProduct.quantity || 0;
-      if (dbProduct.stock < quantityDecrement) {
+
+      const oldQuantity = oldOrderProduct ? oldOrderProduct.quantity : 0;
+      const quantityDifference = product.quantity - oldQuantity;
+
+      if (dbProduct.stock < quantityDifference) {
         throw new Error(`Insufficient stock for product ${dbProduct.name}`);
       }
-      totalAmount += dbProduct.price * quantityDecrement;
+
+      totalAmount += dbProduct.price * product.quantity;
+
       await dbProduct.decrement("stock", {
-        by: -quantityDecrement,
-        where: { id: product.productId },
+        by: quantityDifference,
         transaction: t,
       });
     }
@@ -163,13 +170,16 @@ export const updateOrder = async (req, res) => {
 
   //update product of order
   const updateProductsOrder = async (order, products, t) => {
-    await order.setProducts([], { transaction: t });
-    for (const product of products) {
-      await order.addProduct(product.productId, {
-        through: { quantity: product.quantity },
-        transaction: t,
-      });
-    }
+    const orderProducts = products.map((product) => ({
+      orderId: order.id,
+      productId: product.productId,
+      quantity: product.quantity,
+    }));
+
+    await OrderProduct.bulkCreate(orderProducts, {
+      updateOnDuplicate: ["quantity"],
+      transaction: t,
+    });
   };
 
   // functino principale
