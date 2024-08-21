@@ -7,10 +7,11 @@
 3. [Routes Utilisateurs](#routes-utilisateurs)
 4. [Routes Produits](#routes-produits)
 5. [Routes Commandes](#routes-commandes)
-6. [Middlewares](#middlewares)
-7. [Gestion des erreurs](#gestion-des-erreurs)
-8. [Pagination et filtrage](#pagination-et-filtrage)
-9. [Exemples de requêtes](#exemples-de-requêtes)
+6. [Routes Catégories](#routes-catégories)
+7. [Middlewares](#middlewares)
+8. [Gestion des erreurs](#gestion-des-erreurs)
+9. [Pagination et filtrage](#pagination-et-filtrage)
+10. [Exemples de requêtes](#exemples-de-requêtes)
 
 ## Introduction
 
@@ -51,82 +52,16 @@ L'API utilise l'authentification JWT (JSON Web Token). Pour accéder aux endpoin
 | DELETE  | /orders/:id        | authenticateToken | deleteOrder        | Supprimer une commande                 | -                     |
 | GET     | /orders/statistics | authenticateToken | getOrderStatistics | Obtenir les statistiques des commandes | startDate, endDate    |
 
-### quelques exemples de requêtes et réponses
+## Routes Catégories (Categories)
 
-#### Créer une commande (POST)
-
-```bash
-http://localhost:3000/api/orders
-```
-
-**exemple de contenu de la requête**
-
-```json
-{
-  "userId": 2,
-  "status": "pending",
-  "products": [
-    {
-      "productId": 14,
-      "quantity": 1
-    },
-    {
-      "productId": 9,
-      "quantity": 1
-    }
-  ]
-}
-```
-
-**Reponse 201 Created**
-
-```json
-{
-  "success": true,
-  "message": "Order created successfully",
-  "data": {
-    "id": 32,
-    "status": "pending",
-    "totalAmount": "119.98",
-    "createdAt": "2024-08-21T18:40:01.177Z",
-    "updatedAt": "2024-08-21T18:40:01.177Z",
-    "userId": 2,
-    "user": {
-      "id": 2,
-      "username": "generalpepin",
-      "email": "generalpepin@example.com"
-    },
-    "Products": [
-      {
-        "id": 14,
-        "name": "Travel Pillow",
-        "description": "Memory foam travel pillow",
-        "price": "19.99",
-        "stock": 9,
-        "createdAt": "2024-08-21T14:39:02.846Z",
-        "updatedAt": "2024-08-21T18:40:01.187Z",
-        "categoryId": 21,
-        "OrderProduct": {
-          "quantity": 1
-        }
-      },
-      {
-        "id": 9,
-        "name": "Fitness Tracker",
-        "description": "Latest model fitness tracker",
-        "price": "99.99",
-        "stock": 9,
-        "createdAt": "2024-08-21T14:39:02.846Z",
-        "updatedAt": "2024-08-21T18:40:01.190Z",
-        "categoryId": 18,
-        "OrderProduct": {
-          "quantity": 1
-        }
-      }
-    ]
-  }
-}
-```
+| Méthode | Chemin             | Middleware        | Contrôleur        | Description                      | Paramètres |
+| ------- | ------------------ | ----------------- | ----------------- | -------------------------------- | ---------- |
+| GET     | /categories        | authenticateToken | getAllCategories  | Obtenir toutes les catégories    | -          |
+| GET     | /categories/search | authenticateToken | getCategoryByName | Rechercher une catégorie par nom | name       |
+| GET     | /categories/:id    | authenticateToken | getCategoryById   | Obtenir une catégorie par ID     | -          |
+| POST    | /categories        | authenticateToken | createCategory    | Créer une catégorie              | name,      |
+| PUT     | /categories/:id    | authenticateToken | updateCategory    | Mettre à jour une catégorie      | name,      |
+| DELETE  | /categories/:id    | authenticateToken | deleteCategory    | Supprimer une catégorie          | -          |
 
 ## Middlewares
 
@@ -153,15 +88,3 @@ http://localhost:3000/api/orders
 - Utilisez `page` et `limit` pour la pagination
 - Utilisez `sort` pour trier les résultats (ex: `sort=price` ou `sort=-createdAt`)
 - Des filtres spécifiques sont disponibles pour certaines routes (ex: `category` pour les produits)
-
-## Exemples de requêtes
-
-### Rechercher un utilisateur par son nom
-
-```bash
-http://localhost:3000/api/users/name?username=pepin
-```
-
-```bash
-http://localhost:3000/api/usersproducts/search?status=pending
-```

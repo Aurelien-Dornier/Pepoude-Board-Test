@@ -2,6 +2,7 @@ import { Router } from "express";
 import { router as userRouter } from "./userRoutes.js";
 import { router as productRouter } from "./productRoutes.js";
 import { router as orderRouter } from "./orderRoutes.js";
+import { router as categoryRouter } from "./categoryRoutes.js";
 export const router = Router();
 
 router.get("/", (req, res) => {
@@ -11,3 +12,4 @@ router.get("/", (req, res) => {
 router.use(userRouter);
 router.use(productRouter);
 router.use("/orders", orderRouter);
+router.use("/categories", categoryRouter);
