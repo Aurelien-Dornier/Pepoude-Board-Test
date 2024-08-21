@@ -18,13 +18,10 @@ export default function Login() {
 
     try {
       const user = await loginUser(email, password);
-
-      if (user && user.token) {
+      
+      console.log("User logged in:", user);
       localStorage.setItem("token", user.token);
-      navigate("/dashboard");
-    } else {
-      setError("Login failed. User or token is null.");
-    }
+        navigate("/dashboard");
     } catch (err) {
       setError("Invalid email or password, please try again");
       console.error(err);
