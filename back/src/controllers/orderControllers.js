@@ -264,56 +264,56 @@ export const getOrderStatistics = async (req, res) => {
 
 // Create order
 
-const validateOrderData = async (data) => {
-  const { error } = orderSchema.validate(data);
-  if (error) {
-    throw new Error(error.details[0].message);
-  }
-};
-
-const calculateTotalAmount = async (products) => {
-  let totalAmount = 0;
-  for (const product of products) {
-    const dbProduct = await Product.findByPk(product.productId);
-    if (!dbProduct) {
-      throw new Error(`Product with id ${product.productId} not found`);
-    }
-    if (dbProduct.stock < product.quantity) {
-      throw new Error(`Insufficient stock for product ${dbProduct.name}`);
-    }
-    totalAmount += dbProduct.price * product.quantity;
-  }
-  return totalAmount;
-};
-
-const createOrderInDatabase = async (orderData, t) => {
-  return await Order.create(orderData, { transaction: t });
-};
-
-const addProductsToOrder = async (newOrder, products, t) => {
-  for (const product of products) {
-    await newOrder.addProduct(product.productId, {
-      through: { quantity: product.quantity },
-      transaction: t,
-    });
-    await Product.decrement("stock", {
-      by: product.quantity,
-      where: { id: product.productId },
-      transaction: t,
-    });
-  }
-};
-
-const getCreatedOrder = async (orderId) => {
-  return await Order.findByPk(orderId, {
-    include: [
-      { model: User, attributes: ["id", "username", "email"] },
-      { model: Product, through: { attributes: ["quantity"] } },
-    ],
-  });
-};
-
 export const creatOrder = async (req, res) => {
+  const validateOrderData = async (data) => {
+    const { error } = orderSchema.validate(data);
+    if (error) {
+      throw new Error(error.details[0].message);
+    }
+  };
+
+  const calculateTotalAmount = async (products) => {
+    let totalAmount = 0;
+    for (const product of products) {
+      const dbProduct = await Product.findByPk(product.productId);
+      if (!dbProduct) {
+        throw new Error(`Product with id ${product.productId} not found`);
+      }
+      if (dbProduct.stock < product.quantity) {
+        throw new Error(`Insufficient stock for product ${dbProduct.name}`);
+      }
+      totalAmount += dbProduct.price * product.quantity;
+    }
+    return totalAmount;
+  };
+
+  const createOrderInDatabase = async (orderData, t) => {
+    return await Order.create(orderData, { transaction: t });
+  };
+
+  const addProductsToOrder = async (newOrder, products, t) => {
+    for (const product of products) {
+      await newOrder.addProduct(product.productId, {
+        through: { quantity: product.quantity },
+        transaction: t,
+      });
+      await Product.decrement("stock", {
+        by: product.quantity,
+        where: { id: product.productId },
+        transaction: t,
+      });
+    }
+  };
+
+  const getCreatedOrder = async (orderId) => {
+    return await Order.findByPk(orderId, {
+      include: [
+        { model: User, attributes: ["id", "username", "email"] },
+        { model: Product, through: { attributes: ["quantity"] } },
+      ],
+    });
+  };
+
   const t = await sequelize.transaction();
 
   try {
