@@ -94,10 +94,14 @@ export async function getAllProducts() {
 // Fonction pour obtenir un produit par son id
 export const getProductById = async (id: number): Promise<IProduct | null> => {
   try {
-    const res = await axios.get<IProduct>(`${apiBaseUrl}/api/products/${id}`, {
+    const res = await axios.get<{
+      success: boolean;
+      message: string;
+      data: IProduct;
+    }>(`${apiBaseUrl}/api/products/${id}`, {
       withCredentials: true,
     });
-    return res.data;
+    return res.data.data;
   } catch (error) {
     console.error("getProductById error:", error);
     return null;
