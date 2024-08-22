@@ -13,6 +13,10 @@ export interface IProduct {
   description: string;
   price: number;
   stock: number;
+  createdAt: string;
+  updatedAt: string;
+  categoryId: number;
+  category?: ICategory;
 }
 
 export interface IOrder {

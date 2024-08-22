@@ -97,10 +97,11 @@ export const getProductById = async (id: number): Promise<IProduct | null> => {
     const res = await axios.get<{
       success: boolean;
       message: string;
-      data: IProduct;
+      data: IProduct & { category: ICategory };
     }>(`${apiBaseUrl}/api/products/${id}`, {
       withCredentials: true,
     });
+    console.log("API res.data", res.data); // DEBUG √
     return res.data.data;
   } catch (error) {
     console.error("getProductById error:", error);
@@ -112,10 +113,14 @@ export const getProductById = async (id: number): Promise<IProduct | null> => {
 // Fonction pour obtenir toutes les categories
 export const getAllCategories = async (): Promise<ICategory[]> => {
   try {
-    const res = await axios.get<ICategory[]>(`${apiBaseUrl}/api/categories`, {
+    const res = await axios.get<{
+      success: boolean;
+      message: string;
+      data: ICategory[];
+    }>(`${apiBaseUrl}/api/categories`, {
       withCredentials: true,
     });
-    return res.data;
+    return res.data.data;
   } catch (error) {
     console.error("getAllCategories error:", error);
     return [];
