@@ -119,28 +119,24 @@ export const getOrderById = async (req, res) => {
 
 // Update order
 export const updateOrder = async (req, res) => {
-  const t = await sequelize.transaction();
-  try {
-    const { error } = orderSchema.validate(req.body);
+  // validate order data
+  const validateOrderData = async (data) => {
+    const { error } = orderSchema.validate(data);
     if (error) {
-      return res.status(400).json({
-        success: false,
-        message: "Validation error",
-        errors: error.details[0].message,
-      });
+      throw new Error(error.details[0].message);
     }
-
-    const order = await Order.findByPk(req.params.id);
+  };
+  // get existing order
+  const getExistingOrder = async (orderId) => {
+    const order = await Order.findByPk(orderId);
     if (!order) {
-      return res.status(404).json({
-        success: false,
-        message: "Order not found",
-      });
+      throw new Error("Order not found");
     }
+    return order;
+  };
 
-    const { userId, products, status } = req.body;
-
-    // Recalculate total amount and update stock
+  // recalculate total amount and update stock
+  const calculateTotalAmountAndUpdateStock = async (order, products, t) => {
     let totalAmount = 0;
     for (const product of products) {
       const dbProduct = await Product.findByPk(product.productId);
@@ -148,36 +144,55 @@ export const updateOrder = async (req, res) => {
         throw new Error(`Product with id ${product.productId} not found`);
       }
 
-      const oldQuantity = await order.getProducts({
-        where: { id: product.productId },
-        attributes: ["OrderProduct.quantity"],
+      const oldOrderProduct = await OrderProduct.findOne({
+        where: {
+          orderId: order.id,
+          productId: product.productId,
+        },
       });
 
-      const quantityDiff = product.quantity - (oldQuantity[0]?.OrderProduct.quantity || 0);
+      const oldQuantity = oldOrderProduct ? oldOrderProduct.quantity : 0;
+      const quantityDifference = product.quantity - oldQuantity;
 
-      if (dbProduct.stock < quantityDiff) {
+      if (dbProduct.stock < quantityDifference) {
         throw new Error(`Insufficient stock for product ${dbProduct.name}`);
       }
 
       totalAmount += dbProduct.price * product.quantity;
 
-      await Product.increment("stock", {
-        by: -quantityDiff,
-        where: { id: product.productId },
+      await dbProduct.decrement("stock", {
+        by: quantityDifference,
         transaction: t,
       });
     }
+    return totalAmount;
+  };
 
+  //update product of order
+  const updateProductsOrder = async (order, products, t) => {
+    const orderProducts = products.map((product) => ({
+      orderId: order.id,
+      productId: product.productId,
+      quantity: product.quantity,
+    }));
+
+    await OrderProduct.bulkCreate(orderProducts, {
+      updateOnDuplicate: ["quantity"],
+      transaction: t,
+    });
+  };
+
+  // functino principale
+  const t = await sequelize.transaction();
+
+  try {
+    validateOrderData(req.body);
+
+    const order = await getExistingOrder(req.params.id);
+    const { userId, products, status } = req.body;
+    const totalAmount = await calculateTotalAmountAndUpdateStock(order, products, t);
     await order.update({ userId, status, totalAmount }, { transaction: t });
-
-    await order.setProducts([], { transaction: t });
-    for (const product of products) {
-      await order.addProduct(product.productId, {
-        through: { quantity: product.quantity },
-        transaction: t,
-      });
-    }
-
+    await updateProductsOrder(order, products, t);
     await t.commit();
 
     const updatedOrder = await Order.findByPk(order.id, {
@@ -186,7 +201,6 @@ export const updateOrder = async (req, res) => {
         { model: Product, through: { attributes: ["quantity"] } },
       ],
     });
-
     res.status(200).json({
       success: true,
       message: "Order updated successfully",
@@ -195,11 +209,18 @@ export const updateOrder = async (req, res) => {
   } catch (error) {
     await t.rollback();
     console.error("Error updating order:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error while updating order",
-      error: error.message,
-    });
+    if (error.message === "Order not found") {
+      res.status(404).json({
+        success: false,
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: "Error while updating order",
+        error: error.message,
+      });
+    }
   }
 };
 
@@ -225,6 +246,92 @@ export const deleteOrder = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error while deleting order",
+      error: error.message,
+    });
+  }
+};
+
+// Create order
+export const creatOrder = async (req, res) => {
+  const validateOrderData = async (data) => {
+    const { error } = orderSchema.validate(data);
+    if (error) {
+      throw new Error(error.details[0].message);
+    }
+  };
+
+  const calculateTotalAmount = async (products) => {
+    let totalAmount = 0;
+    for (const product of products) {
+      const dbProduct = await Product.findByPk(product.productId);
+      if (!dbProduct) {
+        throw new Error(`Product with id ${product.productId} not found`);
+      }
+      if (dbProduct.stock < product.quantity) {
+        throw new Error(`Insufficient stock for product ${dbProduct.name}`);
+      }
+      totalAmount += dbProduct.price * product.quantity;
+    }
+    return totalAmount;
+  };
+
+  const createOrderInDatabase = async (orderData, t) => {
+    return await Order.create(orderData, { transaction: t });
+  };
+
+  const addProductsToOrder = async (newOrder, products, t) => {
+    for (const product of products) {
+      await newOrder.addProduct(product.productId, {
+        through: { quantity: product.quantity },
+        transaction: t,
+      });
+      await Product.decrement("stock", {
+        by: product.quantity,
+        where: { id: product.productId },
+        transaction: t,
+      });
+    }
+  };
+
+  const getCreatedOrder = async (orderId) => {
+    return await Order.findByPk(orderId, {
+      include: [
+        { model: User, attributes: ["id", "username", "email"] },
+        { model: Product, through: { attributes: ["quantity"] } },
+      ],
+    });
+  };
+
+  const t = await sequelize.transaction();
+
+  try {
+    validateOrderData(req.body);
+
+    const { userId, products, status } = req.body;
+    const totalAmount = await calculateTotalAmount(products);
+    const newOrder = await createOrderInDatabase({ userId, status, totalAmount }, t);
+    await addProductsToOrder(newOrder, products, t);
+    await t.commit();
+    const createdOrder = await getCreatedOrder(newOrder.id);
+
+    res.status(201).json({
+      success: true,
+      message: "Order created successfully",
+      data: createdOrder,
+    });
+  } catch (error) {
+    await t.rollback();
+    if (error.name === "SequelizeUniqueConstraintError") {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors: error.errors.map((err) => ({ message: err.message, field: err.path })),
+      });
+    }
+    console.error("Error in createOrder:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error while creating order",
       error: error.message,
     });
   }
@@ -257,93 +364,6 @@ export const getOrderStatistics = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error while fetching order statistics",
-      error: error.message,
-    });
-  }
-};
-
-// Create order
-
-const validateOrderData = async (data) => {
-  const { error } = orderSchema.validate(data);
-  if (error) {
-    throw new Error(error.details[0].message);
-  }
-};
-
-const calculateTotalAmount = async (products) => {
-  let totalAmount = 0;
-  for (const product of products) {
-    const dbProduct = await Product.findByPk(product.productId);
-    if (!dbProduct) {
-      throw new Error(`Product with id ${product.productId} not found`);
-    }
-    if (dbProduct.stock < product.quantity) {
-      throw new Error(`Insufficient stock for product ${dbProduct.name}`);
-    }
-    totalAmount += dbProduct.price * product.quantity;
-  }
-  return totalAmount;
-};
-
-const createOrderInDatabase = async (orderData, t) => {
-  return await Order.create(orderData, { transaction: t });
-};
-
-const addProductsToOrder = async (newOrder, products, t) => {
-  for (const product of products) {
-    await newOrder.addProduct(product.productId, {
-      through: { quantity: product.quantity },
-      transaction: t,
-    });
-    await Product.decrement("stock", {
-      by: product.quantity,
-      where: { id: product.productId },
-      transaction: t,
-    });
-  }
-};
-
-const getCreatedOrder = async (orderId) => {
-  return await Order.findByPk(orderId, {
-    include: [
-      { model: User, attributes: ["id", "username", "email"] },
-      { model: Product, through: { attributes: ["quantity"] } },
-    ],
-  });
-};
-
-export const creatOrder = async (req, res) => {
-  const t = await sequelize.transaction();
-
-  try {
-    validateOrderData(req.body);
-
-    const { userId, products, status } = req.body;
-    const totalAmount = await calculateTotalAmount(products);
-    const newOrder = await createOrderInDatabase({ userId, status, totalAmount }, t);
-    await addProductsToOrder(newOrder, products, t);
-    await t.commit();
-    const createdOrder = await getCreatedOrder(newOrder.id);
-
-    res.status(201).json({
-      success: true,
-      message: "Order created successfully",
-      data: createdOrder,
-    });
-  } catch (error) {
-    await t.rollback();
-    if (error.name === "SequelizeUniqueConstraintError") {
-      return res.status(400).json({
-        success: false,
-        message: "Validation error",
-        errors: error.errors.map((err) => ({ message: err.message, field: err.path })),
-      });
-    }
-    console.error("Error in createOrder:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error while creating order",
       error: error.message,
     });
   }

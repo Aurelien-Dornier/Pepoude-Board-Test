@@ -7,10 +7,11 @@
 3. [Routes Utilisateurs](#routes-utilisateurs)
 4. [Routes Produits](#routes-produits)
 5. [Routes Commandes](#routes-commandes)
-6. [Middlewares](#middlewares)
-7. [Gestion des erreurs](#gestion-des-erreurs)
-8. [Pagination et filtrage](#pagination-et-filtrage)
-9. [Exemples de requêtes](#exemples-de-requêtes)
+6. [Routes Catégories](#routes-catégories)
+7. [Middlewares](#middlewares)
+8. [Gestion des erreurs](#gestion-des-erreurs)
+9. [Pagination et filtrage](#pagination-et-filtrage)
+10. [Exemples de requêtes](#exemples-de-requêtes)
 
 ## Introduction
 
@@ -20,7 +21,7 @@ Cette API permet de gérer les utilisateurs, les produits et les commandes pour 
 
 L'API utilise l'authentification JWT (JSON Web Token). Pour accéder aux endpoints protégés, incluez le token dans l'en-tête `Authorization` sous la forme `Bearer <token>`.
 
-## Routes Utilisateurs
+## Routes Utilisateurs (Users)
 
 | Méthode | Chemin       | Middleware        | Contrôleur    | Description                            | Paramètres                      |
 | ------- | ------------ | ----------------- | ------------- | -------------------------------------- | ------------------------------- |
@@ -29,7 +30,7 @@ L'API utilise l'authentification JWT (JSON Web Token). Pour accéder aux endpoin
 | POST    | /login       | -                 | loginUser     | Connexion utilisateur                  | email, password                 |
 | POST    | /register    | validateUser      | registerUser  | Inscription utilisateur                | username, email, password, role |
 
-## Routes Produits
+## Routes Produits (Products)
 
 | Méthode | Chemin           | Middleware        | Contrôleur       | Description                   | Paramètres                         |
 | ------- | ---------------- | ----------------- | ---------------- | ----------------------------- | ---------------------------------- |
@@ -40,7 +41,7 @@ L'API utilise l'authentification JWT (JSON Web Token). Pour accéder aux endpoin
 | PUT     | /products/:id    | authenticateToken | updateProduct    | Mettre à jour un produit      | name, description, price, category |
 | DELETE  | /products/:id    | authenticateToken | deleteProduct    | Supprimer un produit          | -                                  |
 
-## Routes Commandes
+## Routes Commandes (Orders)
 
 | Méthode | Chemin             | Middleware        | Contrôleur         | Description                            | Paramètres            |
 | ------- | ------------------ | ----------------- | ------------------ | -------------------------------------- | --------------------- |
@@ -50,6 +51,17 @@ L'API utilise l'authentification JWT (JSON Web Token). Pour accéder aux endpoin
 | PATCH   | /orders/:id        | authenticateToken | updateOrder        | Mettre à jour une commande             | status                |
 | DELETE  | /orders/:id        | authenticateToken | deleteOrder        | Supprimer une commande                 | -                     |
 | GET     | /orders/statistics | authenticateToken | getOrderStatistics | Obtenir les statistiques des commandes | startDate, endDate    |
+
+## Routes Catégories (Categories)
+
+| Méthode | Chemin             | Middleware        | Contrôleur        | Description                      | Paramètres |
+| ------- | ------------------ | ----------------- | ----------------- | -------------------------------- | ---------- |
+| GET     | /categories        | authenticateToken | getAllCategories  | Obtenir toutes les catégories    | -          |
+| GET     | /categories/search | authenticateToken | getCategoryByName | Rechercher une catégorie par nom | name       |
+| GET     | /categories/:id    | authenticateToken | getCategoryById   | Obtenir une catégorie par ID     | -          |
+| POST    | /categories        | authenticateToken | createCategory    | Créer une catégorie              | name,      |
+| PUT     | /categories/:id    | authenticateToken | updateCategory    | Mettre à jour une catégorie      | name,      |
+| DELETE  | /categories/:id    | authenticateToken | deleteCategory    | Supprimer une catégorie          | -          |
 
 ## Middlewares
 
@@ -76,15 +88,3 @@ L'API utilise l'authentification JWT (JSON Web Token). Pour accéder aux endpoin
 - Utilisez `page` et `limit` pour la pagination
 - Utilisez `sort` pour trier les résultats (ex: `sort=price` ou `sort=-createdAt`)
 - Des filtres spécifiques sont disponibles pour certaines routes (ex: `category` pour les produits)
-
-## Exemples de requêtes
-
-### Rechercher un utilisateur par son nom
-
-```bash
-http://localhost:3000/api/users/name?username=pepin
-```
-
-```bash
-http://localhost:3000/api/usersproducts/search?status=pending
-```
