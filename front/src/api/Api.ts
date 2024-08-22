@@ -109,6 +109,19 @@ export const getProductById = async (id: number): Promise<IProduct | null> => {
   }
 };
 
+// function pour supprimer un produit par son id
+export async function deleteProduct(id: string) {
+  try {
+    const res = await axios.delete(`${apiBaseUrl}/api/products/${id}`, {
+      withCredentials: true,
+    });
+    return res.data;
+  } catch (error) {
+    console.error("deleteProduct error:", error);
+    throw error;
+  }
+}
+
 //+++++CATEGORIES+++++
 // Fonction pour obtenir toutes les categories
 export const getAllCategories = async (): Promise<ICategory[]> => {
