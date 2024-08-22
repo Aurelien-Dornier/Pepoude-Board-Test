@@ -107,3 +107,44 @@ export const createCategory = async (req, res) => {
     });
   }
 };
+
+// update category
+export const updateCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+
+    const { error } = categorySchema.validate(updateData);
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors: error.details[0].message,
+      });
+    }
+
+    const category = await Category.findByPk(id);
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    // Mise à jour partielle
+    await category.update(updateData);
+
+    res.status(200).json({
+      success: true,
+      message: "Category updated successfully",
+      data: category,
+    });
+  } catch (error) {
+    console.error("Error updating category:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error while updating category",
+      error: error.message,
+    });
+  }
+};

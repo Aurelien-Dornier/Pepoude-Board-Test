@@ -16,4 +16,7 @@ router
 
 router.route("/search").get(ctrlWrapper(categoryControllers.getCategoryByName));
 
-router.route("/:id").get(ctrlWrapper(categoryControllers.getCategoryById));
+router
+  .route("/:id")
+  .patch(ctrlWrapper(categoryControllers.updateCategory))
+  .get(ctrlWrapper(categoryControllers.getCategoryById));
