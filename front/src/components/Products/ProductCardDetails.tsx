@@ -51,34 +51,49 @@ export default function ProductDetails() {
   if (!product) return <div>Product not found</div>; // produit non trouvé
 
   return (
-    <div className="bg-white p-4 shadow-md rounded-lg flex flex-col gap-4">
-      <div>
-        <h3 className="text-xl font-semibold">{product.name}</h3>
-        <p className="text-gray-600">{product.description}</p>
-        <p className="text-gray-800 font-bold">${product.price}</p>
-        <p className="text-gray-600">Stock: {product.stock}</p>
-        <p className="text-gray-600">Created At: {product.createdAt}</p>
-        <p className="text-gray-600">Updated At: {product.updatedAt}</p>
-        <p className="text-gray-600">Category: {product.category?.name}</p>
-        <p className="text-gray-600">Category: {product.categoryId}</p>
+    <>
+      <div className="card bg-base-100 w-96 shadow-xl">
+        <figure>
+          <img
+            src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+            alt="Shoes"
+          />
+        </figure>
+        <div className="card-body">
+          <h2 className="card-title">
+            {product.name}
+            <div className="badge badge-secondary">NEW</div>
+          </h2>
+          <p className="text-gray-600">{product.description}</p>
+          <p className="text-gray-500 font-bold">${product.price}</p>
+          <p className="text-gray-400">Stock: {product.stock}</p>
+          <p className="text-gray-600">Category: {product.categoryId}</p>
+          <p className="text-gray-600">Category: {product.category?.name}</p>
+          <p className="text-gray-600">Created At: {product.createdAt}</p>
+          <p className="text-gray-600">Updated At: {product.updatedAt}</p>
+          <div className="flex flex-col gap-4">
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded-md"
+              onClick={handleBack}
+            >
+              Retour
+            </button>
+            <button
+              className="bg-red-500 text-white px-4 py-2 rounded-md"
+              onClick={handleDelete}
+            >
+              Supprimer
+            </button>
+            <button className="bg-green-500 text-white px-4 py-2 rounded-md">
+              Modifier
+            </button>
+          </div>
+          <div className="card-actions justify-end">
+            <div className="badge badge-outline">Fashion</div>
+            <div className="badge badge-outline">Products</div>
+          </div>
+        </div>
       </div>
-      <div className="flex flex-col gap-4">
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md"
-          onClick={handleBack}
-        >
-          Retour
-        </button>
-        <button
-          className="bg-red-500 text-white px-4 py-2 rounded-md"
-          onClick={handleDelete}
-        >
-          Supprimer
-        </button>
-        <button className="bg-blue-500 text-white px-4 py-2 rounded-md">
-          Modifier
-        </button>
-      </div>
-    </div>
+    </>
   );
 }
