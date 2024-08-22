@@ -1,20 +1,24 @@
 import { Routes, Route } from "react-router-dom";
+
+// Components
 import Menu from "../components/Menu";
-import Products from "../components/Products";
+import ProductsPage from "../components/Products/ProductsPage";
 import Users from "../components/Users";
 import Orders from "../components/Orders";
+import ProductDetails from "../components/Products/ProductCardDetails";
 
 export default function Dashboard() {
   return (
     <div className="flex grow">
       <div>
-      <Menu />
+        <Menu /> // menu sur la gauche
       </div>
       <div className="w-full">
         <Routes>
-          <Route path="/products" element={<Products />}/>
-          <Route path="/users" element={<Users/>}/>
-          <Route path="/orders" element={<Orders/>}/>
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/products/:id" element={<ProductDetails />} />
+          <Route path="/users" element={<Users />} />
+          <Route path="/orders" element={<Orders />} />
         </Routes>
       </div>
     </div>
