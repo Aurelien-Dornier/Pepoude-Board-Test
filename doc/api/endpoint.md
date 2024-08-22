@@ -54,14 +54,15 @@ L'API utilise l'authentification JWT (JSON Web Token). Pour accéder aux endpoin
 
 ## Routes Catégories (Categories)
 
-| Méthode | Chemin             | Middleware        | Contrôleur        | Description                      | Paramètres |
-| ------- | ------------------ | ----------------- | ----------------- | -------------------------------- | ---------- |
-| GET     | /categories        | authenticateToken | getAllCategories  | Obtenir toutes les catégories    | -          |
-| GET     | /categories/search | authenticateToken | getCategoryByName | Rechercher une catégorie par nom | name       |
-| GET     | /categories/:id    | authenticateToken | getCategoryById   | Obtenir une catégorie par ID     | -          |
-| POST    | /categories        | authenticateToken | createCategory    | Créer une catégorie              | name,      |
-| PUT     | /categories/:id    | authenticateToken | updateCategory    | Mettre à jour une catégorie      | name,      |
-| DELETE  | /categories/:id    | authenticateToken | deleteCategory    | Supprimer une catégorie          | -          |
+| Méthode | Chemin                 | Middleware        | Contrôleur            | Description                             | Paramètres |
+| ------- | ---------------------- | ----------------- | --------------------- | --------------------------------------- | ---------- |
+| GET     | /categories            | authenticateToken | getAllCategories      | Obtenir toutes les catégories           | -          |
+| GET     | /categories/search     | authenticateToken | getCategoryByName     | Rechercher une catégorie par nom        | name       |
+| GET     | /categories/:id        | authenticateToken | getCategoryById       | Obtenir une catégorie par ID            | -          |
+| POST    | /categories            | authenticateToken | createCategory        | Créer une catégorie                     | name,      |
+| PUT     | /categories/:id        | authenticateToken | updateCategory        | Mettre à jour une catégorie             | name,      |
+| DELETE  | /categories/:id        | authenticateToken | deleteCategory        | Supprimer une catégorie                 | -          |
+| GET     | /categories/statistics | authenticateToken | getCategoryStatistics | Obtenir les statistiques des catégories | -          |
 
 ## Middlewares
 
