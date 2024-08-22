@@ -31,34 +31,34 @@ export default function App() {
   };
 
   return (
-      <div className="flex flex-col min-h-screen bg-gray-100">
-        {/* Le header commun */}
-        <Header />
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      {/* Le header commun */}
+      <Header />
 
-        <Routes>
-          {/* Routes publiques */}
-          <Route path="/login" element={<Login onLogin={handleLogin} />} />
-          <Route path="/register" element={<Register />} />
+      <Routes>
+        {/* Routes publiques */}
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/register" element={<Register />} />
 
-          {/* Route protégée par une authentification */}
-          <Route
-            path="/dashboard/*"
-            element={<PrivateRoute isAuthenticated={isAuthenticated} />}
-          >
-            <Route path="" element={<Dashboard />} />
-          </Route>
+        {/* Route protégée par une authentification */}
+        <Route
+          path="/dashboard/*"
+          element={<PrivateRoute isAuthenticated={isAuthenticated} />}
+        >
+          <Route path="*" element={<Dashboard />} />
+        </Route>
 
-          {/* Redirection par défaut */}
-          <Route
-            path="*"
-            element={
-              isAuthenticated ? <Dashboard /> : <Login onLogin={handleLogin} />
-            }
-          />
-        </Routes>
+        {/* Redirection par défaut */}
+        <Route
+          path="*"
+          element={
+            isAuthenticated ? <Dashboard /> : <Login onLogin={handleLogin} />
+          }
+        />
+      </Routes>
 
-        {/* Le footer commun */}
-        <Footer />
-      </div>
+      {/* Le footer commun */}
+      <Footer />
+    </div>
   );
 }
