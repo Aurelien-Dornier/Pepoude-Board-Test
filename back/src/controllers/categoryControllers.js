@@ -1,7 +1,7 @@
 import { models } from "../models/index.js";
 import Joi from "joi";
 import { Op } from "sequelize";
-
+import { Sequelize } from "sequelize";
 const { Category, Product } = models;
 
 const categorySchema = Joi.object({
@@ -144,6 +144,71 @@ export const updateCategory = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error while updating category",
+      error: error.message,
+    });
+  }
+};
+
+// delete category
+export const deleteCategory = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const category = await Category.findByPk(id);
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+        error: "Category not found",
+      });
+    }
+    await category.destroy();
+    res.status(200).json({
+      success: true,
+      message: "Category deleted successfully",
+    });
+  } catch (error) {
+    console.error("error in delete category", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+// get statistics
+export const getCategoryStatistics = async (req, res) => {
+  try {
+    const totalCategories = await Category.count();
+    const categoriesWithProductsCount = await Category.findAll({
+      attributes: [
+        "id",
+        "name",
+        [Sequelize.fn("COUNT", Sequelize.col("products.id")), "productCount"],
+      ],
+      include: [
+        {
+          model: Product,
+          as: "products",
+          attributes: [],
+        },
+      ],
+      group: ["Category.id"],
+      raw: true,
+    });
+    res.status(200).json({
+      success: true,
+      message: "Categories fetched successfully",
+      data: {
+        totalCategories,
+        categoriesWithProductsCount,
+      },
+    });
+  } catch (error) {
+    console.error("error in get category statistics", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
       error: error.message,
     });
   }
