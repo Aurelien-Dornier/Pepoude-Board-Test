@@ -51,7 +51,7 @@ export default function Menu() {
           </ul>
         </li>
         <li>
-          <Link to="/products">
+          <Link to="/dashboard/products">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -83,7 +83,7 @@ export default function Menu() {
           </ul>
         </li>
         <li>
-          <Link to="/users">
+          <Link to="/dashboard/users">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
