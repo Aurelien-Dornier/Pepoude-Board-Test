@@ -112,12 +112,41 @@ export const getProductById = async (id: number): Promise<IProduct | null> => {
 // function pour supprimer un produit par son id
 export async function deleteProduct(id: string) {
   try {
-    const res = await axios.delete(`${apiBaseUrl}/api/products/${id}`, {
+    const token = localStorage.getItem("token");
+    const res = await axios.delete<{
+      success: boolean;
+      message: string;
+      data: IProduct & { category: ICategory };
+    }>(`${apiBaseUrl}/api/products/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
       withCredentials: true,
     });
-    return res.data;
+    return res.data.data;
   } catch (error) {
     console.error("deleteProduct error:", error);
+    throw error;
+  }
+}
+
+// function pour ajouter un produit
+export async function addProduct(product: IProduct) {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.post<{
+      success: boolean;
+      message: string;
+      data: IProduct & { category: ICategory };
+    }>(`${apiBaseUrl}/api/products`, product, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error("addProduct error:", error);
     throw error;
   }
 }
