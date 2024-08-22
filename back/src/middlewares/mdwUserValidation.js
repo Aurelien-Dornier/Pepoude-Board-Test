@@ -6,7 +6,7 @@ const userSchame = Joi.object({
   password: Joi.string()
     .pattern(new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*])[A-Za-z\\d!@#$%^&*]{8,}$"))
     .required(),
-  role: Joi.string().valid("user", "admin").required(),
+  role: Joi.string().valid("user", "admin").default("user"),
 });
 
 export const validateUser = (req, res, next) => {

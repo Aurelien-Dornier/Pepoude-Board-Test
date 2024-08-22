@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { IUser } from "../@types";
 import { apiBaseUrl } from "../api/config";
 
@@ -7,9 +7,10 @@ export const createAccount = async (data: {
   username: string;
   email: string;
   password: string;
-}): Promise<IUser | null> => {
+  
+}): Promise<{ success: boolean; message: string; data: { user: IUser } | null }> => {
   try {
-    const response = await axios.post<IUser>(
+    const response = await axios.post<{ user: IUser }>(
       `${apiBaseUrl}/api/register`,
       data,
       {
@@ -17,10 +18,19 @@ export const createAccount = async (data: {
         withCredentials: true,
       }
     );
-    return response.data;
+    return { success: true, message: "Account created successfully", data: response.data };
   } catch (error) {
-    console.error("createAccount error:", error);
-    return null;
+    let errorMessage = "An error occurred during registration";
+
+    if (error instanceof AxiosError && error.response) {
+      // Capture et affiche les détails spécifiques de l'erreur de validation
+      const validationErrors = error.response.data.errors || error.response.data.message || error.message;
+      errorMessage = validationErrors;
+
+      console.error("createAccount error details:", validationErrors);  // Affiche les détails d'erreur
+    }
+
+    return { success: false, message: errorMessage, data: null };
   }
 };
 

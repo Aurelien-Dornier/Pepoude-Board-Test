@@ -1,60 +1,64 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
+import Login from "./components/Login";
+import Register from "./components/Register";
 import Dashboard from "./pages/Dashboard";
+import PrivateRoute from "./components/PrivateRoute";
 
 export default function App() {
-  // gestion de l'authentification
+  // Gestion de l'authentification
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // fonction pour vérifier l'authentification
+  // Fonction pour vérifier l'authentification
   const checkAuth = () => {
     const token = localStorage.getItem("token");
     setIsAuthenticated(Boolean(token));
   };
-  // vérification + ajout d'un écouteur d'événement pour la modification du localStorage
+
+  // Vérification + ajout d'un écouteur d'événement pour la modification du localStorage
   useEffect(() => {
     checkAuth();
     window.addEventListener("storage", checkAuth);
     return () => window.removeEventListener("storage", checkAuth);
   }, []);
 
+  // Gestion du login
   const handleLogin = (token: string) => {
-    // console.log("Handling login with token:", token); // debug
     localStorage.setItem("token", token);
     setIsAuthenticated(true);
   };
 
   return (
-    <div className="bg-gray-200 min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-grow h-full">
+      <div className="min-h-screen bg-gray-100">
+        {/* Le header commun */}
+        <Header />
+
         <Routes>
+          {/* Routes publiques */}
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/register" element={<Register />} />
+
+          {/* Route protégée par une authentification */}
           <Route
-            path="/"
+            path="/dashboard/*"
+            element={<PrivateRoute isAuthenticated={isAuthenticated} />}
+          >
+            <Route path="" element={<Dashboard />} />
+          </Route>
+
+          {/* Redirection par défaut */}
+          <Route
+            path="*"
             element={
-              isAuthenticated ? (
-                <Navigate to="/dashboard" />
-              ) : (
-                <Navigate to="/login" />
-              )
+              isAuthenticated ? <Dashboard /> : <Login onLogin={handleLogin} />
             }
           />
-          <Route
-            path="/login"
-            element={<LoginPage onLogin={handleLogin} />}
-          />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route
-            path="/dashboard"
-            element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
-          />
         </Routes>
-      </main>
-      <Footer />
-    </div>
+
+        {/* Le footer commun */}
+        <Footer />
+      </div>
   );
 }

@@ -8,35 +8,50 @@ export default function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState(""); // Nouveau champ pour confirmer le mot de passe
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false); // Indicateur de chargement
+  const [loading, setLoading] = useState(false);
+
+  const validateEmail = (email: string) => {
+    return /\S+@\S+\.\S+/.test(email);
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Vérification que le mot de passe et la confirmation correspondent
+    // Vérification que les mots de passe correspondent
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
-    setLoading(true); // Commencer le chargement
-    setError(""); // Réinitialiser l'erreur
+    // Validation basique du format de l'email
+    if (!validateEmail(email)) {
+      setError("Invalid email format");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
 
     try {
-      const user = await createAccount({
+      const result = await createAccount({
         username,
         email,
         password,
       });
-      console.log("User created:", user);
-      navigate("/login"); // Rediriger vers la page de connexion après succès
+
+      if (result.success) {
+        console.log("User created:", result);
+        navigate("/login"); // Rediriger vers la page de connexion après succès
+      } else {
+        setError(result.message); // Afficher le message d'erreur
+      }
     } catch (err) {
-      setError("An error occurred during registration, please try again");
-      console.error(err);
+      setError("Unexpected error occurred during registration.");
+      console.error("Unexpected error:", err);
     } finally {
-      setLoading(false); // Arrêter le chargement
+      setLoading(false);
     }
   };
 
@@ -45,6 +60,7 @@ export default function Register() {
   };
 
   return (
+    <div className="flex justify-center items-center bg-gray-100">
     <div className="card bg-white w-full max-w-lg shadow-2xl">
       <form onSubmit={handleRegister} className="card-body">
         <h2 className="card-title text-3xl text-gray-900 pb-4">Inscription</h2>
@@ -116,8 +132,7 @@ export default function Register() {
               type="submit"
               disabled={loading}
             >
-              {loading ? "Signing Up..." : "Sign Up"}{" "}
-              {/* Bouton de soumission */}
+              {loading ? "Registering..." : "Register"} {/* Bouton de soumission */}
             </button>
           </div>
           <div className="form-control mt-6">
@@ -129,5 +144,6 @@ export default function Register() {
         </div>
       </form>
     </div>
+  </div>
   );
 }

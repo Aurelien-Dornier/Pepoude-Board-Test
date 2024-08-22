@@ -1,13 +1,15 @@
+import { Routes, Route } from "react-router-dom";
 import Menu from "../components/Menu";
+import Products from "../components/Products";
 
 export default function Dashboard() {
   return (
-    <div className="flex h-full">
-      <div className="w-1/6 h-full">
-        <Menu />
-      </div>
+    <div className="flex fixed h-full w-full">
+      <Menu />
       <div>
-        <h1>Accueil</h1>
+        <Routes>
+          <Route path="/products" element={<Products />}/>
+        </Routes>
       </div>
     </div>
   );
