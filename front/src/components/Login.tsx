@@ -44,8 +44,8 @@ export default function Login({
   };
 
   return (
-    <div className="flex justify-center items-center bg-gray-100">
-      <div className="card bg-white w-full max-w-md shadow-2xl">
+    <div className="flex grow justify-center items-center bg-gray-100">
+      <div className="card bg-white w-full max-w-md shadow-2x">
         <form onSubmit={handleLogin} className="card-body">
           <h2 className="card-title text-3xl text-gray-900 pb-4">Connexion</h2>
           {error && <p className="text-red-500 text-center mb-4">{error}</p>}

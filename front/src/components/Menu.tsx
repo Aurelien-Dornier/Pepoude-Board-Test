@@ -24,7 +24,7 @@ export default function Menu() {
           </a>
         </li>
         <li>
-          <a>
+          <Link to="/orders">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -40,7 +40,7 @@ export default function Menu() {
               />
             </svg>
             Commandes
-          </a>
+          </Link>
           <ul>
             <li>
               <a>Submenu 1</a>
@@ -83,7 +83,7 @@ export default function Menu() {
           </ul>
         </li>
         <li>
-          <a>
+          <Link to="/users">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -99,7 +99,7 @@ export default function Menu() {
               />
             </svg>
             Utilisateurs
-          </a>
+          </Link>
         </li>
       </ul>
     </nav>

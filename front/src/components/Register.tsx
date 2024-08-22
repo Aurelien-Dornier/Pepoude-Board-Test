@@ -60,7 +60,7 @@ export default function Register() {
   };
 
   return (
-    <div className="flex justify-center items-center bg-gray-100">
+    <div className="flex grow justify-center items-center bg-gray-100">
     <div className="card bg-white w-full max-w-lg shadow-2xl">
       <form onSubmit={handleRegister} className="card-body">
         <h2 className="card-title text-3xl text-gray-900 pb-4">Inscription</h2>

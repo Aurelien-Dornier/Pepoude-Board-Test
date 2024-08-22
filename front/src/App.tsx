@@ -31,7 +31,7 @@ export default function App() {
   };
 
   return (
-      <div className="min-h-screen bg-gray-100">
+      <div className="flex flex-col min-h-screen bg-gray-100">
         {/* Le header commun */}
         <Header />
 
