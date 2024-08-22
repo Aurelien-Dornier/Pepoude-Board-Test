@@ -14,7 +14,7 @@ export default function ProductsPage() {
         setIsLoading(true);
         const allProducts = await getAllProducts();
         setProducts(allProducts);
-        console.log("Products state updated:", allProducts);
+        // console.log("Products state updated:", allProducts); // DEBUG √
       } catch (error) {
         console.error("Error in fetchProducts:", error);
         setError("Failed to fetch products.");
@@ -25,7 +25,7 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
-  console.log("Current products state:", products);
+  //console.log("Current products state:", products); DEBUG √
 
   return (
     <div className="p-8">

@@ -82,8 +82,8 @@ export async function getAllProducts() {
       },
       withCredentials: true,
     });
-    console.log(token);
-    console.log("API res.data", res.data);
+    // console.log(token); DEBUG √
+    // console.log("API res.data", res.data); // DEBUG √
     return res.data.data;
   } catch (error) {
     console.error("getAllProducts error:", error);
