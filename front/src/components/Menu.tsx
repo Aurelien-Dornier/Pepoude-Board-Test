@@ -75,7 +75,7 @@ export default function Menu() {
           </Link>
           <ul>
             <li>
-              <a>Ajouter Un Produit</a>
+              <Link to="/dashboard/add-products">Ajouter Un Produit</Link>
             </li>
             <li>
               <a>Submenu 2</a>

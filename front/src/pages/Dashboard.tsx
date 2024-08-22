@@ -6,6 +6,7 @@ import ProductsPage from "../components/Products/ProductsPage";
 import Users from "../components/Users";
 import Orders from "../components/Orders";
 import ProductDetails from "../components/Products/ProductCardDetails";
+import AddProductsPage from "../components/Products/addProductsPage";
 
 export default function Dashboard() {
   return (
@@ -17,6 +18,7 @@ export default function Dashboard() {
         <Routes>
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/products/:id" element={<ProductDetails />} />
+          <Route path="/add-products" element={<AddProductsPage />} />
           <Route path="/users" element={<Users />} />
           <Route path="/orders" element={<Orders />} />
         </Routes>
