@@ -75,7 +75,7 @@ export default function Menu() {
           </Link>
           <ul>
             <li>
-              <a>Submenu 1</a>
+              <a>Ajouter Un Produit</a>
             </li>
             <li>
               <a>Submenu 2</a>
