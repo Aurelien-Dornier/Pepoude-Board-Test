@@ -5,7 +5,7 @@ export default function Menu() {
     <nav className="bg-white shadow h-full">
       <ul className="menu bg-white text-lg max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <li>
-          <a>
+          <Link to="/">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -21,7 +21,7 @@ export default function Menu() {
               />
             </svg>
             Accueil
-          </a>
+          </Link>
         </li>
         <li>
           <Link to="/orders">
