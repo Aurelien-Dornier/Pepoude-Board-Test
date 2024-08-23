@@ -3,6 +3,7 @@ import { IUser, ICategory, IProduct } from "../@types";
 import { apiBaseUrl } from "../api/config";
 
 //+++++AUTH+++++
+
 // Fonction pour créer un compte utilisateur
 export const createAccount = async (data: {
   username: string;
@@ -68,6 +69,7 @@ export const loginUser = async (
 };
 
 //+++++PRODUCTS+++++
+
 // Fonction pour obtenir tous les produits
 export async function getAllProducts() {
   try {
@@ -152,19 +154,24 @@ export async function addProduct(product: IProduct) {
 }
 
 //+++++CATEGORIES+++++
+
 // Fonction pour obtenir toutes les categories
-export const getAllCategories = async (): Promise<ICategory[]> => {
+export async function getAllCategories(): Promise<ICategory[]> {
   try {
+    const token = localStorage.getItem("token");
     const res = await axios.get<{
       success: boolean;
       message: string;
       data: ICategory[];
     }>(`${apiBaseUrl}/api/categories`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
       withCredentials: true,
     });
     return res.data.data;
   } catch (error) {
     console.error("getAllCategories error:", error);
-    return [];
+    throw error;
   }
-};
+}

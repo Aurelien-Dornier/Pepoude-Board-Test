@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { addProduct } from "../../api/Api";
+import { addProduct, getAllCategories } from "../../api/Api";
 import { IProduct, ICategory } from "../../@types";
 
 export default function AddProductsPage() {
@@ -13,16 +13,38 @@ export default function AddProductsPage() {
     setError,
   } = useForm<Omit<IProduct, "id" | "createdAt" | "updatedAt">>();
   const [loading, setLoading] = React.useState(false);
+  const [categories, setCategories] = React.useState<ICategory[]>([]);
 
+  // Fetch categories from the API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesData = await getAllCategories();
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error("Failed to fetch categories", error);
+        setError("root", {
+          type: "manual",
+          message: "Failed to fetch categories. Please try again.",
+        });
+      }
+    };
+    fetchCategories();
+  }, [setError]);
+  // Submit the form
   const onSubmit = async (
-    data: Omit<IProduct, "id" | "createdAt" | "updatedAt">
+    data: Omit<IProduct, "id" | "createdAt" | "updatedAt"> & {
+      id?: number;
+      createdAt?: string;
+      updatedAt?: string;
+    }
   ) => {
     setLoading(true);
     try {
-      await addProduct(data);
+      await addProduct(data as IProduct); // Cast data to IProduct
       navigate("/products");
     } catch (error) {
-      console.error("Failed to add product", error);
+      console.error("Failed to add product:", error);
       setError("root", {
         type: "manual",
         message: "Failed to add product. Please try again.",
@@ -128,18 +150,21 @@ export default function AddProductsPage() {
 
           <div className="form-control">
             <label className="label">
-              <span className="label-text">Category ID</span>
+              <span className="label-text">Category</span>
             </label>
-            <input
-              type="number"
-              placeholder="Category ID"
-              className={`input input-bordered bg-gray-200 ${
-                errors.categoryId ? "input-error" : ""
+            <select
+              className={`select select-bordered bg-gray-200 ${
+                errors.categoryId ? "select-error" : ""
               }`}
-              {...register("categoryId", {
-                required: "Category ID is required",
-              })}
-            />
+              {...register("categoryId", { required: "Category is required" })}
+            >
+              <option value="">Select a category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
             {errors.categoryId && (
               <p className="text-red-500 text-xs mt-1">
                 {errors.categoryId.message}
