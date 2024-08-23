@@ -92,7 +92,7 @@ export async function getAllProducts() {
 }
 
 // Fonction pour obtenir un produit par son id
-export const getProductById = async (id: number): Promise<IProduct | null> => {
+export const getProductById = async (id: string): Promise<IProduct | null> => {
   try {
     const res = await axios.get<{
       success: boolean;

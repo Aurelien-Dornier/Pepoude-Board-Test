@@ -15,7 +15,7 @@ export default function ProductDetails() {
       if (!id) return;
       try {
         setIsLoading(true);
-        const fetchedProduct = await getProductById(parseInt(id, 10));
+        const fetchedProduct = await getProductById(id);
         if (fetchedProduct) {
           setProduct(fetchedProduct);
         } else {
@@ -67,8 +67,6 @@ export default function ProductDetails() {
           <p className="text-gray-600">{product.description}</p>
           <p className="text-gray-500 font-bold">${product.price}</p>
           <p className="text-gray-400">Stock: {product.stock}</p>
-          <p className="text-gray-600">Category: {product.categoryId}</p>
-          <p className="text-gray-600">Category: {product.category?.name}</p>
           <p className="text-gray-600">Created At: {product.createdAt}</p>
           <p className="text-gray-600">Updated At: {product.updatedAt}</p>
           <div className="flex flex-col gap-4">
@@ -89,8 +87,7 @@ export default function ProductDetails() {
             </button>
           </div>
           <div className="card-actions justify-end">
-            <div className="badge badge-outline">Fashion</div>
-            <div className="badge badge-outline">Products</div>
+            <div className="badge badge-outline">{product.category?.name}</div>
           </div>
         </div>
       </div>

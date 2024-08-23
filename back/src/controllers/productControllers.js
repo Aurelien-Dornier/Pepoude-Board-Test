@@ -1,7 +1,7 @@
 import { models } from "../models/index.js";
 import { Op } from "sequelize";
 import Joi from "joi";
-const { Product } = models;
+const { Product, Category } = models;
 
 // Get all products
 export const getAllProducts = async (req, res) => {
@@ -72,7 +72,9 @@ export const getProductByName = async (req, res) => {
 // Get product by id
 export const getProductById = async (req, res) => {
   try {
-    const product = await Product.findByPk(req.params.id);
+    const product = await Product.findByPk(req.params.id, {
+      include: [{ model: Category, as: "category" }],
+    });
     if (!product) {
       return res.status(404).json({
         success: false,
