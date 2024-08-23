@@ -9,13 +9,14 @@ export default function OrdersPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const allOrders = async () => {
+    async function allOrders() {
       try {
+        setLoading(true);
         const orders = await getAllOrders();
         setOrders(Array.isArray(orders) ? orders : []); // Vérifie que c'est bien un tableau
-      } catch (err) {
+      } catch (error) {
         setError("Failed to fetch orders");
-        console.error(err);
+        console.error(error);
       } finally {
         setLoading(false);
       }
@@ -39,7 +40,7 @@ export default function OrdersPage() {
     <div className="p-8">
       <h2 className="card-title text-3xl text-gray-900 pb-4">Commandes</h2>
       <div className="flex flex-col gap-6 bg-white shadow-2xl my-6 p-8 w-full">
-        {orders.map((order) => (
+        {Array.isArray(orders) && orders.map((order) => (
           <OrderCard key={order.id} order={order} />
         ))}
       </div>
