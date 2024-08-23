@@ -171,18 +171,24 @@ export const getAllCategories = async (): Promise<ICategory[]> => {
 
 //+++++ORDERS+++++
 // Fonction pour obtenir toutes les commandes
-export async function getAllOrders(): Promise<IOrder[]> {
+export async function getAllOrders() {
   try {
-  const res = await axios.get<{
-    success: boolean;
-    message: string;
-    data: IOrder[];
-  }>(`${apiBaseUrl}/api/orders`, {
-    withCredentials: true,
-  });
-  return res.data.data;
-} catch (error) {
-  console.error("getAllOrders error:", error);
-  return [];
+    const token = localStorage.getItem("token");
+    const res = await axios.get<{
+      success: boolean;
+      message: string;
+      data: IOrder[];
+    }>(`${apiBaseUrl}/api/orders`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    // console.log(token); DEBUG √
+    // console.log("API res.data", res.data); // DEBUG √
+    return res.data.data;
+  } catch (error) {
+    console.error("getAllOrders error:", error);
+    throw error;
+  }
 }
-};
