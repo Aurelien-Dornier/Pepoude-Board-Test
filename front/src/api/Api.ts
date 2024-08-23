@@ -153,6 +153,26 @@ export async function addProduct(product: IProduct) {
   }
 }
 
+export async function searchProducts(query: string): Promise<IProduct[]> {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.get<{
+      success: boolean;
+      message: string;
+      data: IProduct[];
+    }>(`${apiBaseUrl}/api/products/search?query=${query}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error("searchProducts error:", error);
+    throw error;
+  }
+}
+
 //+++++CATEGORIES+++++
 
 // Fonction pour obtenir toutes les categories

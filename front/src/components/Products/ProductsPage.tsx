@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import { IProduct } from "../../@types";
 import { getAllProducts } from "../../api/Api";
+import SearchComponent from "./searchProducts";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<IProduct[]>([]);
@@ -30,6 +31,7 @@ export default function ProductsPage() {
   return (
     <div className="p-8">
       <h2 className="card-title text-3xl text-gray-900 pb-4">Produits</h2>
+      <SearchComponent onSearchResults={setProducts} />
       {isLoading ? (
         <div>Loading...</div>
       ) : error ? (
