@@ -1,4 +1,4 @@
-export default function Home() {
+export default function HomePage() {
   return (
     <div className="p-8">
       <h2 className="card-title text-3xl text-gray-900 pb-4">Accueil</h2>
