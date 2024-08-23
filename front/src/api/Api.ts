@@ -66,41 +66,103 @@ export const loginUser = async (
     throw error;
   }
 };
+
 //+++++PRODUCTS+++++
 // Fonction pour obtenir tous les produits
-export async function getAllProducts (): Promise<IProduct[]> {
+export async function getAllProducts() {
   try {
-    const res = await axios.get<IProduct[]>(`${apiBaseUrl}/api/products`, {
+    const token = localStorage.getItem("token");
+    const res = await axios.get<{
+      success: boolean;
+      message: string;
+      data: IProduct[];
+    }>(`${apiBaseUrl}/api/products`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
       withCredentials: true,
     });
-    return res.data;
+    // console.log(token); DEBUG √
+    // console.log("API res.data", res.data); // DEBUG √
+    return res.data.data;
   } catch (error) {
     console.error("getAllProducts error:", error);
-    return [];
+    throw error;
   }
-};
+}
 
 // Fonction pour obtenir un produit par son id
 export const getProductById = async (id: number): Promise<IProduct | null> => {
   try {
-    const res = await axios.get<IProduct>(`${apiBaseUrl}/api/products/${id}`, {
+    const res = await axios.get<{
+      success: boolean;
+      message: string;
+      data: IProduct & { category: ICategory };
+    }>(`${apiBaseUrl}/api/products/${id}`, {
       withCredentials: true,
     });
-    return res.data;
+    console.log("API res.data", res.data); // DEBUG √
+    return res.data.data;
   } catch (error) {
     console.error("getProductById error:", error);
     return null;
   }
 };
 
+// function pour supprimer un produit par son id
+export async function deleteProduct(id: string) {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.delete<{
+      success: boolean;
+      message: string;
+      data: IProduct & { category: ICategory };
+    }>(`${apiBaseUrl}/api/products/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error("deleteProduct error:", error);
+    throw error;
+  }
+}
+
+// function pour ajouter un produit
+export async function addProduct(product: IProduct) {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.post<{
+      success: boolean;
+      message: string;
+      data: IProduct & { category: ICategory };
+    }>(`${apiBaseUrl}/api/products`, product, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error("addProduct error:", error);
+    throw error;
+  }
+}
+
 //+++++CATEGORIES+++++
 // Fonction pour obtenir toutes les categories
 export const getAllCategories = async (): Promise<ICategory[]> => {
   try {
-    const res = await axios.get<ICategory[]>(`${apiBaseUrl}/api/categories`, {
+    const res = await axios.get<{
+      success: boolean;
+      message: string;
+      data: ICategory[];
+    }>(`${apiBaseUrl}/api/categories`, {
       withCredentials: true,
     });
-    return res.data;
+    return res.data.data;
   } catch (error) {
     console.error("getAllCategories error:", error);
     return [];
@@ -111,22 +173,16 @@ export const getAllCategories = async (): Promise<ICategory[]> => {
 // Fonction pour obtenir toutes les commandes
 export async function getAllOrders(): Promise<IOrder[]> {
   try {
-    const token = localStorage.getItem("token"); // Récupérer le token du localStorage
-
-    if (!token) {
-      throw new Error("No token found. Please log in.");
-    }
-
-    const res = await axios.get<IOrder[]>(`${apiBaseUrl}/api/orders`, {
-      headers: {
-        Authorization: `Bearer ${token}`, // Envoyer le token dans l'en-tête
-      },
-      withCredentials: true,
-    });
-
-    return res.data;
-  } catch (error) {
-    console.error("getAllOrders error:", error);
-    return [];
-  }
+  const res = await axios.get<{
+    success: boolean;
+    message: string;
+    data: IOrder[];
+  }>(`${apiBaseUrl}/api/orders`, {
+    withCredentials: true,
+  });
+  return res.data.data;
+} catch (error) {
+  console.error("getAllOrders error:", error);
+  return [];
+}
 };

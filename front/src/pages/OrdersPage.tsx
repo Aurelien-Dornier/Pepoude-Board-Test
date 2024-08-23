@@ -5,7 +5,7 @@ import { getAllOrders } from "../api/Api";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<IOrder[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -13,14 +13,14 @@ export default function OrdersPage() {
       try {
         setLoading(true);
         const orders = await getAllOrders();
-        setOrders(Array.isArray(orders) ? orders : []); // Vérifie que c'est bien un tableau
+        setOrders(orders);
       } catch (error) {
         setError("Failed to fetch orders");
         console.error(error);
       } finally {
         setLoading(false);
       }
-    };
+    }
     allOrders();
   }, []);
 
@@ -40,9 +40,8 @@ export default function OrdersPage() {
     <div className="p-8">
       <h2 className="card-title text-3xl text-gray-900 pb-4">Commandes</h2>
       <div className="flex flex-col gap-6 bg-white shadow-2xl my-6 p-8 w-full">
-        {Array.isArray(orders) && orders.map((order) => (
-          <OrderCard key={order.id} order={order} />
-        ))}
+        {Array.isArray(orders) &&
+          orders.map((order) => <OrderCard key={order.id} order={order} />)}
       </div>
     </div>
   );
