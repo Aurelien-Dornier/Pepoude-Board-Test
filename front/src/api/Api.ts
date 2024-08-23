@@ -192,3 +192,25 @@ export async function getAllOrders() {
     throw error;
   }
 }
+
+// Fonction pour obtenir une commande par son id
+export const getOrderById = async (id: number): Promise<IOrder | null> => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.get<{
+      success: boolean;
+      message: string;
+      data: IOrder;
+    }>(`${apiBaseUrl}/api/orders/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    console.log("API res.data", res.data); // DEBUG √
+    return res.data.data;
+  } catch (error) {
+    console.error("getOrderById error:", error);
+    return null;
+  }
+};
