@@ -6,10 +6,10 @@ interface OrderCardProps {
 
 export default function OrderCard({ order }: OrderCardProps) {
   return (
-        <div className="navbar bg-gray-100">
+        <div className="navbar flex justify-between bg-gray-100">
           <p>{order.id}</p>
           <p>{order.status}</p>
-          <p>{order.totalAmount}</p>
+          <p>{order.totalAmount}€</p>
           </div>
   );
 }
