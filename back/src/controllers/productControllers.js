@@ -1,7 +1,7 @@
 import { models } from "../models/index.js";
 import { Op } from "sequelize";
 import Joi from "joi";
-const { Product } = models;
+const { Product, Category } = models;
 
 // Get all products
 export const getAllProducts = async (req, res) => {
@@ -23,9 +23,9 @@ export const getAllProducts = async (req, res) => {
 };
 
 // Search product by name
-export const getProductByName = async (req, res) => {
+export const searchProduct = async (req, res) => {
   const searchSchema = Joi.object({
-    name: Joi.string().min(1).required(),
+    query: Joi.string().min(1).required(),
   });
   try {
     const { error } = searchSchema.validate(req.query);
@@ -37,33 +37,36 @@ export const getProductByName = async (req, res) => {
       });
     }
 
-    const { name } = req.query;
+    const { query } = req.query;
 
-    const product = await Product.findAll({
+    const products = await Product.findAll({
       where: {
-        name: {
-          [Op.like]: `%${name}%`,
-        },
+        [Op.or]: [
+          { name: { [Op.iLike]: `%${query}%` } },
+          { description: { [Op.iLike]: `%${query}%` } },
+        ],
       },
+      include: [{ model: Category, as: "category" }],
       limit: 15,
     });
-    if (product.length === 0) {
+
+    if (products.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Product not found",
-        errors: "No product found with this criteria",
+        message: "Products not found",
+        errors: "No products found with this criteria",
       });
     }
     res.status(200).json({
       success: true,
-      message: "Product found",
-      data: product,
+      message: "Products found",
+      data: products,
     });
   } catch (error) {
-    console.error("Error in getProductByName:", error);
+    console.error("Error in searchProduct:", error);
     res.status(500).json({
       success: false,
-      message: "An error occurred while fetching products",
+      message: "An error occurred while searching for products",
       error: error.message,
     });
   }
@@ -72,7 +75,9 @@ export const getProductByName = async (req, res) => {
 // Get product by id
 export const getProductById = async (req, res) => {
   try {
-    const product = await Product.findByPk(req.params.id);
+    const product = await Product.findByPk(req.params.id, {
+      include: [{ model: Category, as: "category" }],
+    });
     if (!product) {
       return res.status(404).json({
         success: false,

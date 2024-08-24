@@ -1,15 +1,21 @@
-import axios from "axios";
-import { IUser } from "../@types";
+import axios, { AxiosError } from "axios";
+import { IUser, ICategory, IProduct } from "../@types";
 import { apiBaseUrl } from "../api/config";
+
+//+++++AUTH+++++
 
 // Fonction pour créer un compte utilisateur
 export const createAccount = async (data: {
   username: string;
   email: string;
   password: string;
-}): Promise<IUser | null> => {
+}): Promise<{
+  success: boolean;
+  message: string;
+  data: { user: IUser } | null;
+}> => {
   try {
-    const response = await axios.post<IUser>(
+    const response = await axios.post<{ user: IUser }>(
       `${apiBaseUrl}/api/register`,
       data,
       {
@@ -17,10 +23,26 @@ export const createAccount = async (data: {
         withCredentials: true,
       }
     );
-    return response.data;
+    return {
+      success: true,
+      message: "Account created successfully",
+      data: response.data,
+    };
   } catch (error) {
-    console.error("createAccount error:", error);
-    return null;
+    let errorMessage = "An error occurred during registration";
+
+    if (error instanceof AxiosError && error.response) {
+      // Capture et affiche les détails spécifiques de l'erreur de validation
+      const validationErrors =
+        error.response.data.errors ||
+        error.response.data.message ||
+        error.message;
+      errorMessage = validationErrors;
+
+      console.error("createAccount error details:", validationErrors); // Affiche les détails d'erreur
+    }
+
+    return { success: false, message: errorMessage, data: null };
   }
 };
 
@@ -28,7 +50,11 @@ export const createAccount = async (data: {
 export const loginUser = async (
   email: string,
   password: string
-): Promise<{success: boolean, message: string, data: {token: string, user: IUser}}> => {
+): Promise<{
+  success: boolean;
+  message: string;
+  data: { token: string; user: IUser };
+}> => {
   try {
     const response = await axios.post(
       `${apiBaseUrl}/api/login`,
@@ -41,3 +67,131 @@ export const loginUser = async (
     throw error;
   }
 };
+
+//+++++PRODUCTS+++++
+
+// Fonction pour obtenir tous les produits
+export async function getAllProducts() {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.get<{
+      success: boolean;
+      message: string;
+      data: IProduct[];
+    }>(`${apiBaseUrl}/api/products`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    // console.log(token); DEBUG √
+    // console.log("API res.data", res.data); // DEBUG √
+    return res.data.data;
+  } catch (error) {
+    console.error("getAllProducts error:", error);
+    throw error;
+  }
+}
+
+// Fonction pour obtenir un produit par son id
+export const getProductById = async (id: string): Promise<IProduct | null> => {
+  try {
+    const res = await axios.get<{
+      success: boolean;
+      message: string;
+      data: IProduct & { category: ICategory };
+    }>(`${apiBaseUrl}/api/products/${id}`, {
+      withCredentials: true,
+    });
+    console.log("API res.data", res.data); // DEBUG √
+    return res.data.data;
+  } catch (error) {
+    console.error("getProductById error:", error);
+    return null;
+  }
+};
+
+// function pour supprimer un produit par son id
+export async function deleteProduct(id: string) {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.delete<{
+      success: boolean;
+      message: string;
+      data: IProduct & { category: ICategory };
+    }>(`${apiBaseUrl}/api/products/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error("deleteProduct error:", error);
+    throw error;
+  }
+}
+
+// function pour ajouter un produit
+export async function addProduct(product: IProduct) {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.post<{
+      success: boolean;
+      message: string;
+      data: IProduct & { category: ICategory };
+    }>(`${apiBaseUrl}/api/products`, product, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error("addProduct error:", error);
+    throw error;
+  }
+}
+
+export async function searchProducts(query: string): Promise<IProduct[]> {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.get<{
+      success: boolean;
+      message: string;
+      data: IProduct[];
+    }>(`${apiBaseUrl}/api/products/search?query=${query}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error("searchProducts error:", error);
+    throw error;
+  }
+}
+
+//+++++CATEGORIES+++++
+
+// Fonction pour obtenir toutes les categories
+export async function getAllCategories(): Promise<ICategory[]> {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.get<{
+      success: boolean;
+      message: string;
+      data: ICategory[];
+    }>(`${apiBaseUrl}/api/categories`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      withCredentials: true,
+    });
+    return res.data.data;
+  } catch (error) {
+    console.error("getAllCategories error:", error);
+    throw error;
+  }
+}

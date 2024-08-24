@@ -8,20 +8,22 @@ const categorySchema = Joi.object({
   name: Joi.string().required().min(2).max(50),
 });
 
-//get all categories
+// Get all categories
 export const getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.findAll();
+    const categories = await Category.findAll({
+      attributes: ["id", "name"],
+    });
     res.status(200).json({
       success: true,
       message: "Categories fetched successfully",
       data: categories,
     });
   } catch (error) {
-    console.error("error in get all categories", error);
+    console.error("Error in getAllCategories:", error);
     res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Error while fetching categories",
       error: error.message,
     });
   }

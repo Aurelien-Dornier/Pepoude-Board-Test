@@ -7,7 +7,7 @@ export const router = Router();
 //get all products
 router.get("/products", ctrlWrapper(productControllers.getAllProducts));
 // search product by name
-router.get("/products/search", ctrlWrapper(productControllers.getProductByName));
+router.get("/products/search", ctrlWrapper(productControllers.searchProduct));
 // get product by id
 router.get("/products/:id", ctrlWrapper(productControllers.getProductById));
 // create product
