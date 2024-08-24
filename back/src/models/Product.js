@@ -47,5 +47,10 @@ export class Product extends Model {
       foreignKey: "productId",
       otherKey: "orderId",
     });
+    this.hasMany(models.Notification, {
+      foreignKey: "productId",
+      as: "notifications",
+      onDelete: "CASCADE",
+    });
   }
 }

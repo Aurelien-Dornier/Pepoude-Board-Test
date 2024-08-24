@@ -5,6 +5,8 @@ import { OrderProduct } from "./OrderProduct.js";
 import { Category } from "./Category.js";
 import { Log } from "./Log.js";
 import { Message } from "./Message.js";
+import { Notification } from "./Notification.js";
+
 import { sequelize } from "./dbClient.js";
 
 export const models = {
@@ -14,6 +16,7 @@ export const models = {
   Product: Product.init(sequelize),
   Message: Message.init(sequelize),
   OrderProduct: OrderProduct.init(sequelize),
+  Notification: Notification.init(sequelize),
   Log: Log.init(sequelize),
 };
 // Associations si elles existent

@@ -75,6 +75,11 @@ export class User extends Model {
       as: "logs",
       onDelete: "CASCADE",
     });
+    this.hasMany(models.Notification, {
+      foreignKey: "createdBy",
+      as: "notifications",
+      onDelete: "CASCADE",
+    });
   }
 
   static async hashPassword(password) {

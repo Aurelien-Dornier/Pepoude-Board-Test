@@ -29,5 +29,10 @@ export class Category extends Model {
       foreignKey: "categoryId",
       as: "products",
     });
+    this.hasMany(models.Notification, {
+      foreignKey: "categoryId",
+      as: "notifications",
+      onDelete: "CASCADE",
+    });
   }
 }

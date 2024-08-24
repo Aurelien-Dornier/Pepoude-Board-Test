@@ -2,7 +2,7 @@ import { DataTypes, Model } from "sequelize";
 
 export class Notification extends Model {
   static init(sequelize) {
-    super.init(
+    return super.init(
       {
         id: {
           type: DataTypes.INTEGER,
