@@ -43,6 +43,7 @@ L'application `client` utilise principalement :
 
 ## Lancer le projet avec docker
 
+- Ne pas oublier de modifier le fichier .env dans le dossier et de la placer dans le dossier racine et non dans le api avec des informations de connexion à la base de données. (`DB_HOST=database`) pour les autres variables d'environnement, elles peuvent être inscritent de facon random on pense au password et secret par contre.🧠
 - dans le dossier racine du projet : `docker-compose up --build` pour construire et lancer les containers
 
 ```bash
