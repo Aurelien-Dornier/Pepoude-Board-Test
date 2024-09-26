@@ -7,5 +7,4 @@ Dockerfile
 README.md
 .env
 doc
-pnpm-lock.yaml
-pnpm-workspace.yaml
+

@@ -13,7 +13,9 @@ services:
     command: npm run dev
   
   client:
-    build: ./client
+    build: 
+      context: ./client
+      dockerfile: Dockerfile
     ports:
       - "5173:5173"
     depends_on:
