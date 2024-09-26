@@ -1,0 +1,70 @@
+# kiboude-pepin - Tests & déploiement
+
+## Architecture
+
+L'application kiboude-pepin est une application de gestion de Produit en mode _Single Page Application_ (SPA) découpée en deux projets :
+
+- un serveur d'API REST, dans le répertoire `api`
+- une application client Web, dans le répertoire `client`.
+
+L'application `api` utilise principalement les technologies suivantes :
+
+- base de données [PostgreSQL](https://www.postgresql.org/)
+- serveur Web [Express](http://expressjs.com/)
+- bibliothèque de validation de données [joi](https://joi.dev/)
+- ORM [Sequelize](https://sequelize.org/)
+
+L'application `client` utilise principalement :
+
+- le framework [React](https://reactjs.org/)
+- le bundler [Vite](https://vitejs.dev/)
+
+## Installation et configuration
+
+### Lancer le projet sans docker
+
+- préparer une base de données pour stocker les données du projet
+- installer les dépendances des deux projets avec `pnpm install` depuis la racine du projet.
+  - note : un doc pnpm-workspace.yaml est present dans à la racine du projet pour installer les dépendances des deux projets avec `pnpm install` depuis la racine du projet.
+- dans les projets `api` et `client` : `cp .env.example .env`
+
+  - penser à modifier ce qui doit l'être !
+  - attention : le fichier .env dans le dossier api doit contenir les informations de connexion à la base de données. `DB_HOST=database` n'est donc pas valide car il faudrait lancer le projet avec docker. la passer par `DB_HOST=localhost` pour l'utiliser en local sans docker.
+
+- à la première installation :
+  - `pnpm run db:create` : créer la structure de la base de données
+  - `pnpm run db:seed` : insérer des données
+- si besoin de réinitialiser la base de données : `pnpm run db:reset`
+
+  - Note : depuis le dossier racine du projet : `pnpm run db:reset` permet de lancer les scripts `db:create` puis `db:seed` dans le dossier `api` afin de remettre en place une base de donnée propre.
+
+  - lancer le projet avec `pnpm run dev` depuis le dossier racine du projet.
+    - note : ou aller dans le dossier `api` et lancer `pnpm run dev` ou dans le dossier `client` et lancer `pnpm run dev`
+
+## Lancer le projet avec docker
+
+- dans le dossier racine du projet : `docker-compose up --build` pour construire et lancer les containers
+
+```bash
+docker-compose up --build
+```
+
+- ensuite ne pas oublier de seed la base de donnée avec les données initiales :
+
+```bash
+docker-compose exec api npm run db:reset
+```
+
+- pour accéder au container de l'api depuis le container si besoin :
+
+```bash
+docker-compose exec api bash
+```
+
+- pour accéder au container du client depuis le container si besoin :
+
+```bash
+docker-compose exec client bash
+```
+
+- pour plus d'infos sur les commandes docker : [docker](https://docs.docker.com/engine/reference/commandline/docker/)
