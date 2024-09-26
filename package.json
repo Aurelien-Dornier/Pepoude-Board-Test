@@ -1,0 +1,11 @@
+{
+  "name": "kiboude-pepin",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "private": true,
+ 
+  "scripts": {
+    "dev": "pnpm -r --parallel --stream run dev"
+  }
+}
