@@ -1,5 +1,5 @@
 {
-  "name": "back-kiboude-pepin",
+  "name": "api",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
@@ -13,7 +13,8 @@
     "lint:fix": "eslint --fix .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "jest "
+    "test": "jest ",
+    "start-with-seed": "npm run db:reset && npm run start"
   },
   "keywords": [],
   "author": "",
@@ -29,20 +30,9 @@
     "sequelize": "^6.37.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@babel/preset-env": "^7.25.3",
-    "@babel/register": "^7.24.6",
-    "@eslint/js": "^9.9.0",
+ 
     "@faker-js/faker": "^8.4.1",
-    "@types/jsonwebtoken": "^9.0.6",
-    "babel-jest": "^29.7.0",
-    "eslint": "^9.9.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-jest": "^28.8.0",
-    "eslint-plugin-prettier": "^5.2.1",
-    "jest": "^29.7.0",
+  
     "joi": "^17.13.3",
     "nodemon": "^3.1.4",
     "prettier": "^3.3.3",

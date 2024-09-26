@@ -4,9 +4,10 @@ import { seedOrders } from "./seeders/seedOrders.js";
 import { seedMessages } from "./seeders/seedMessages.js";
 import { seedLogs } from "./seeders/seedLogs.js";
 import { seedCategories } from "./seeders/seedCategory.js";
+import { sequelize } from "../models/dbClient.js";
 
 export async function seedDataBase() {
-  console.log("🌱 Seeding database...");
+  console.log(" Seeding database...");
   try {
     await seedUsers();
     const categories = await seedCategories();
@@ -17,6 +18,9 @@ export async function seedDataBase() {
     console.log("🌱 Database seeded successfully");
   } catch (error) {
     console.error("🚨 Error seeding database:", error);
+  } finally {
+    await sequelize.close();
+    console.log("📌Database connection closed");
   }
 }
 
