@@ -9,5 +9,5 @@ declare global {
 }
 
 export const apiBaseUrl = import.meta.env.PROD 
-  ? (import.meta.env.VITE_API_URL || "https://votre-api-render.onrender.com")
+  ? (import.meta.env.VITE_API_URL || "https://kiboude-pepin-api.onrender.com")
   : "http://localhost:3000";
