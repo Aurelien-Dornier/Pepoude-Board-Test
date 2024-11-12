@@ -5,6 +5,8 @@ import { router } from "./src/routes/router.js";
 
 import { sessionMdw } from "./src/middlewares/sessionMdw.js";
 import { middleware404 } from "./src/middlewares/middleware404.js";
+import { autoMigrate } from "./src/utils/autoMigrate.js"    
+
 const app = express();
 
 app.use(express.json());
@@ -22,9 +24,20 @@ app.use("/api", router);
 // Middlewares 404
 app.use(middleware404);
 
+
+async function startServer() {
+  try {
+    if (process.env.NODE_ENV === 'production') {
+      await autoMigrate();
+    }
+    app.listen(process.env.PORT || 3000, () => {
+      console.log(`Server is running on port ${process.env.PORT || 3000}`);
+    });
+  } catch (error) {
+    console.error('Error starting server:', error);
+  }
+}
+
 // Démarrer le serveur
-const port = process.env.PORT || 3001;
-app.listen(port, () => {
-  console.log(`🚀 Server listening at http://localhost:${port}`);
-});
+startServer();
 export default app;

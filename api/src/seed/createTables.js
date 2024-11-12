@@ -1,6 +1,6 @@
 import { sequelize } from "../models/index.js";
 
-const createDataBase = async () => {
+export const createDataBase = async () => {
   try {
     console.log("🚀Creating database...");
     await sequelize.sync({ force: true });
