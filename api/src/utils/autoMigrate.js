@@ -4,6 +4,10 @@ import { seedDataBase } from '../seed/seedDataBase.js';
 
 export async function autoMigrate() {
   try {
+    // Établir la connexion
+    await sequelize.authenticate();
+    console.log('📡 Connected to database');
+
     // Vérifier si la base de données est vide
     const tables = await sequelize.query(
       "SELECT table_name FROM information_schema.tables WHERE table_schema='public'"
@@ -19,5 +23,6 @@ export async function autoMigrate() {
     }
   } catch (error) {
     console.error('Erreur pendant la migration automatique:', error);
+    throw error;
   }
 }

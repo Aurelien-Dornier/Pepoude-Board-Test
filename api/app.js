@@ -3,9 +3,10 @@ import express from "express";
 import cors from "cors";
 import { router } from "./src/routes/router.js";
 
+import { Server } from "./src/server.js";
 import { sessionMdw } from "./src/middlewares/sessionMdw.js";
 import { middleware404 } from "./src/middlewares/middleware404.js";
-import { autoMigrate } from "./src/utils/autoMigrate.js"    
+   
 
 const app = express();
 
@@ -24,20 +25,6 @@ app.use("/api", router);
 // Middlewares 404
 app.use(middleware404);
 
-
-async function startServer() {
-  try {
-    if (process.env.NODE_ENV === 'production') {
-      await autoMigrate();
-    }
-    app.listen(process.env.PORT || 3000, () => {
-      console.log(`Server is running on port ${process.env.PORT || 3000}`);
-    });
-  } catch (error) {
-    console.error('Error starting server:', error);
-  }
-}
-
-// Démarrer le serveur
-startServer();
+const server = new Server(app)
+server.start();
 export default app;

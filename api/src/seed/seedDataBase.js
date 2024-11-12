@@ -18,10 +18,8 @@ export async function seedDataBase() {
     console.log("🌱 Database seeded successfully");
   } catch (error) {
     console.error("🚨 Error seeding database:", error);
-  } finally {
-    await sequelize.close();
-    console.log("📌Database connection closed");
-  }
+    throw error;
+  } 
 }
 
 seedDataBase();

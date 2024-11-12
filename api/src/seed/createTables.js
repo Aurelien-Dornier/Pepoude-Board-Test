@@ -7,8 +7,8 @@ export const createDataBase = async () => {
     console.log("✅ Database created successfully");
   } catch (error) {
     console.log("❌ Error creating database", error);
-  } finally {
-    await sequelize.close();
-  }
+    throw error;
+  } 
+  
 };
 createDataBase();
