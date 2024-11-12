@@ -2,21 +2,11 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-# Copier les fichiers package.json et pnpm-lock.yaml
-COPY package*.json pnpm-lock.yaml ./
-
-# Installer pnpm globalement
-RUN npm install -g pnpm
-
-# Installer les dépendances
-RUN pnpm install --prod --frozen-lockfile
-
 COPY . .
 
-# Variable d'environnement pour la production
-ENV NODE_ENV=production
+RUN npm install
 
-# Le port sera défini par Render
+ENV NODE_ENV=production
 ENV PORT=10000
 
 EXPOSE $PORT
